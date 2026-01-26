@@ -15,19 +15,19 @@ export default function ProjectContext() {
       </div>
 
       <Form.Item
-        label="Feature Name"
+        label="App / Feature Name"
         name="featureName"
-        rules={[{ required: true, message: 'Please enter the feature name' }]}
-        tooltip="The name of the feature you're designing"
+        rules={[{ required: true, message: 'Please enter the app or feature name' }]}
+        tooltip="The name of the app or feature you're designing"
       >
         <Input placeholder="e.g., User Authentication Flow" />
       </Form.Item>
 
       <Form.Item
-        label="Product / Company"
+        label="Company / Product"
         name="productCompany"
-        rules={[{ required: true, message: 'Please enter the product or company name' }]}
-        tooltip="The product context (e.g., 'DoorDash Merchant Portal (web application)')"
+        rules={[{ required: true, message: 'Please enter the company or product name' }]}
+        tooltip="The company and product context (e.g., 'DoorDash Merchant Portal (web application)')"
       >
         <Input placeholder="e.g., Acme Dashboard (web application)" />
       </Form.Item>
