@@ -1,0 +1,1359 @@
+# AI Design Workflow Guide
+
+Version: 2.0
+Last updated: 11.04.25
+
+This guide will walk you through an AI-powered design process that helps you quickly generate, iterate, and communicate design concepts for product features.
+
+**Based on:** Double Diamond Design Thinking Figma Make workflow for rapid ideation and stakeholder alignment.
+
+**Time estimate:** 1-2 weeks from brief to refined designs (with fast initial iterations in first 2-3 days)
+
+---
+
+## What You'll Accomplish
+
+By following this workflow, you'll be able to:
+- ✅ Transform product briefs into multiple design concepts quickly (or create context from scratch if you don't have one yet)
+- ✅ Generate both near-term (tactical) and long-term (strategic) design prototypes in Figma Make or V0 to test concepts
+- ✅ Iterate based on product roadmaps and strategic planning
+- ✅ Communicate future-state thinking effectively
+
+---
+
+## Before We Begin
+
+**You'll need:**
+1. **Product brief or requirements** from your PM (OR we'll help you create the context from scratch—see "Starting Without a PRD" below)
+3. **Figma Make access** (for AI-generated designs)
+4. **Figma account** (for prototyping and refinement)
+5. **Access to your company's design system** (for final polish)
+6. **Optional:** Strategic documents (product roadmaps, 2026+ plans)
+
+**Skills assumed:**
+- Basic Figma proficiency
+- Familiarity with your product domain
+- Ability to communicate with Cursor effectively
+
+---
+
+## 🆕 Starting Without a PRD or Brief?
+
+**No problem!** If you're just ramping up on a project and don't have formal documentation yet, I'll guide you through a discovery conversation to gather the context we need.
+
+**I'll help you:**
+- Understand what you know (and don't know) about the project
+- Identify key stakeholders to talk to
+- Ask the right discovery questions
+- Document what you learn in a structured way
+- Create a Design Context that's good enough to start designing
+
+**This is common when:**
+- You're joining a project mid-stream
+- The project is very early stage
+- Requirements are still being defined
+- You need to do upfront discovery work
+
+---
+> **AI INSTRUCTIONS:** When this file is opened or run, always greet the user and offer the following menu of options:
+> 
+> "How can I help you today?
+> I can assist you with:
+ 1. 🎯 **Starting from scratch:** "I'm looking for help with discovery and ideation"
+ 2. 💬 **Generating prompts:** "Help me create a Figma Make prompt for [my feature]"
+ 3. 🔄 **Refining existing work:** "How do I improve my Figma Make designs..."
+ 4. 📋 **Feedback:** "Help me predict sticking points and feedback on key challenges"
+ 5. 🤔 **Answering questions:** "How do I handle [specific challenge]?"
+> 
+> What would you like to work on?"
+>
+> Do not proceed with the workflow until the user responds with their choice.
+>
+> **When user selects Option 1 (Starting from scratch):**
+>
+> **FIRST - Determine what documentation they have:**
+> 
+> Ask: "Before we start, let me understand what you're working with:
+> 
+> **Do you have any of the following?**
+> - A) ✅ **I have a PRD or product brief** (from PM, stakeholder, or documentation)
+> - B) 📝 **I have some notes or partial information** (emails, meeting notes, Slack threads)
+> - C) ❌ **I'm starting fresh** (no documentation yet, ramping up on a new project)
+> 
+> Which best describes your situation?"
+>
+> ---
+>
+> **If they select A (Have a PRD):**
+> - Automatically create a "_Design Context for [Project Title].md" template file in their project folder
+> - Automatically create a "_Notes Holding Tank.md" file in their project folder (for collecting info over time)
+> - Check if a `_PRD for [Project Title].md` file exists in the project structure
+> - If it doesn't exist, create the file
+> - Ask them to paste the PRD content into the file
+> - If the PRD contains tables, instruct them: "If your PRD has tables, please save it as a .md file first and paste that markdown directly in. This preserves formatting."
+> - Once pasted, read the file and extract information to populate the Design Context template
+>
+> **If they select B (Have partial information):**
+> - Automatically create a "_Design Context for [Project Title].md" template file in their project folder
+> - Automatically create a "_Notes Holding Tank.md" file in their project folder (for collecting info over time)
+> - Ask them what they have: "What information do you have? You can:
+>   - Paste notes, emails, or Slack threads directly here
+>   - Point me to files in your workspace
+>   - Tell me what you know conversationally"
+> - Extract any available information to populate the Design Context template
+> - Then proceed to **Guided Discovery Questions** (below) to fill in gaps
+>
+> **If they select C (Starting fresh):**
+> - Automatically create a "_Design Context for [Project Title].md" template file in their project folder
+> - Automatically create a "_Notes Holding Tank.md" file in their project folder (for collecting info over time)
+> - Say: "No problem! I'll walk you through some discovery questions to help you gather what we need. We'll document what you know, identify gaps, and figure out who to talk to."
+> - Proceed to **Guided Discovery Questions** (below)
+>
+> ---
+>
+> ## Guided Discovery Questions (For Partial or No Documentation)
+>
+> **Use these questions in a conversational way. Don't overwhelm—ask one or two at a time. Let the user say "I don't know yet" and we'll note it as something to discover.**
+>
+> ### Round 1: The Basics
+>
+> Start with these to understand the foundation:
+>
+> 1. **"What's the project or feature you're working on?"**
+>    - (Just a name or brief description is fine)
+>
+> 2. **"What do you know about why this project exists?"**
+>    - (What problem is it trying to solve? What triggered it?)
+>    - If they don't know: Note as discovery item → "Needs: Understand business case"
+>
+> 3. **"Who are the users or customers this is for?"**
+>    - (What role? What context? How often will they use it?)
+>    - If they don't know: Note as discovery item → "Needs: Define target users"
+>
+> 4. **"Do you know what success looks like for this project?"**
+>    - (Metrics? Outcomes? What would make this a win?)
+>    - If they don't know: Note as discovery item → "Needs: Define success metrics"
+>
+> 5. **"Are there any constraints you're aware of?"**
+>    - (Timeline? Technical limits? Scope? Compliance/security?)
+>    - If they don't know: Note as discovery item → "Needs: Understand constraints"
+>
+> ---
+>
+> ### Round 2: Stakeholders & Next Steps
+>
+> Once you have the basics, identify who to talk to:
+>
+> 6. **"Who's the Product Manager or main stakeholder for this project?"**
+>    - (Write down their name)
+>
+> 7. **"Are there other key people involved?"**
+>    - (Engineering lead? Other designers? Researchers? Data scientists?)
+>
+> 8. **"What information do you think you need most urgently?"**
+>    - Help them prioritize what to ask about first
+>
+> ---
+>
+> ### Round 3: What They Do Know (Current Understanding)
+>
+> Document their current mental model, even if incomplete:
+>
+> 9. **"Based on what you know so far, what do you think the solution might look like?"**
+>    - (Any early ideas? Rough concepts? Features you've heard mentioned?)
+>
+> 10. **"What feels challenging or tricky about this problem?"**
+>     - (Edge cases? Conflicting needs? Complexity?)
+>
+> 11. **"Are there any existing features or products this relates to?"**
+>     - (What's the context within the broader product?)
+>
+> ---
+>
+> ### After Guided Questions: Create Action Plan
+>
+> Once you've asked these questions, create a summary:
+>
+> **"Here's what we know so far:"**
+> - [List what they shared]
+>
+> **"Here's what we need to discover:"**
+> - [List gaps and unknowns]
+>
+> **"Recommended next steps:"**
+> 1. **Schedule 30-minute conversation with [PM/Stakeholder]** to understand:
+>    - [Specific questions based on gaps]
+> 2. **Review any existing documentation** (look for: [suggest where to look])
+> 3. **Once you have more context, come back and we'll update the Design Context together**
+>
+> **Generate a stakeholder interview guide:**
+> - Create `_Stakeholder Interview Questions for [Project Title].md`
+> - Include tailored questions based on identified gaps
+> - Suggest who to ask each question to
+>
+> **Populate the Design Context file with:**
+> - Everything they told you (marked as "Current understanding")
+> - Gaps clearly marked (marked as "TO DISCOVER" or "TBD - ask [stakeholder]")
+> - Action items for next steps
+> - Instructions at the top on how to use both the Design Context and Notes Holding Tank files
+>
+> **Then say:** "Once you've talked to [stakeholder] or gathered more info, you can either:
+> - Dump notes in the '_Notes Holding Tank.md' file and come back anytime saying 'Process my holding tank notes'
+> - Share what you learned directly and I'll update the Design Context right away
+> 
+> The holding tank is great for collecting info over the next few days without staying in this chat!"
+
+---
+
+---
+
+## Step 1 of 6: Discovery & Initial Ideation
+
+Start by understanding the problem space and creating your first-pass concepts.
+
+**I've created two files in your project folder:**
+1. **"_Design Context for [Project Title].md"** - Your structured design context template
+2. **"_Notes Holding Tank.md"** - Your dump zone for collecting info over time (most recent at top)
+
+**How would you like to fill out the Design Context?**
+1. 📄 **I have a PRD or design document in google** - I'll create a `_PRD for [Project Title].md` file for you to paste it into, then extract information
+2. 📎 **Point me to files in your workspace** - I'll read existing files and populate the template
+3. 📝 **I have some notes or partial information** - Share what you have and I'll help fill in gaps with guided questions
+4. ❌ **I'm starting fresh with no documentation** - I'll walk you through discovery questions to gather context
+5. ✍️ **Fill it out yourself** - Edit the template directly at your own pace
+
+**Note:** If your PRD contains tables, save it as a .md file first and paste the markdown directly. This preserves table formatting.
+
+### Manual Steps:
+
+**A. Gather Requirements**
+1. Review the product brief from your PM (or complete guided discovery questions if you don't have one)
+2. Identify the core problem to solve
+3. Note any constraints (technical, timeline, scope)
+4. List out the key user needs and business goals
+5. Identify uniquely challenging user needs design needs to consider
+
+**B. Create First-Pass Concepts**
+1. Open your preferred sketching tool (Figma, FigJam, paper)
+2. Create initial wireframes or concept sketches
+3. Don't worry about perfection - focus on structure and flow
+4. Label key sections and functionality
+
+**C. Identify Opportunity Areas**
+1. Beyond the immediate brief, what could this become?
+2. What related problems exist that this feature could address?
+3. What would a "future version" include?
+4. Document these as bullet points
+
+**Example:**
+- Core brief: Create an edit tool for SKUs (product listings)
+- First pass: SKU info on one side, merchant data (read-only) on the other
+- Opportunity areas:
+  - Live preview of customer-facing view
+  - Image quality improvements
+  - SKU health metrics and analytics
+  - A/B testing capabilities
+  - Change history tracking
+
+**D. Define Success Metrics & Create Dashboard**
+
+1. Create a `_Success Metrics for [Project Title].md` file in your project folder
+2. Work with Product and Data Science to define:
+   - **Primary metrics:** Adoption rate, completion rate, business impact
+   - **Guardrail metrics:** Things that shouldn't get worse (completion rate, time to complete, satisfaction)
+   - **Segmentation:** How to slice the data (user type, business size, etc.)
+3. Pull metrics from PRD if available, if not - schedule alignment meeting
+4. Define baselines and targets
+5. This helps you design with measurement in mind from the start
+
+**Then I will automatically generate a V0 prompt** for you to create a metrics dashboard:
+- Copy the V0 prompt I provide
+- Go to [v0.dev](https://v0.dev)
+- Paste the prompt and generate your dashboard
+- Publish to Vercel and share the link with your XFN team
+- Update the dashboard by asking V0 to modify specific sections as data comes in
+
+**Why this matters:** You can't know if your design works without defining success upfront. A visual dashboard keeps the team aligned on progress.
+
+### Questions to Answer:
+
+Before moving to Step 2, ensure you can answer:
+- ✅ What is the core problem I'm solving?
+- ✅ What are the must-have features vs. nice-to-haves?
+- ✅ What constraints am I working within?
+- ✅ What opportunity areas exist beyond the brief?
+- ✅ How will we measure if this design succeeds?
+
+**Note:** If you still have gaps after initial discovery, that's okay! Document what you know and what you need to find out. You can iterate on the Design Context as you learn more.
+
+**What's Next:** Step 2 - Generate AI Design Prompt
+
+---
+
+## Step 2 of 6: Generate AI Design Prompt with Cursor
+
+Transform your ideation into a structured prompt for Figma Make.
+
+### Manual Steps:
+
+**A. Prepare Your Context**
+
+Gather these materials:
+1. Your first-pass concept sketches or wireframes (you'll add these to Figma Make in Step 3 as visual references)
+2. Product brief or requirements (or your Design Context if you created it from discovery)
+3. List of opportunity areas
+4. Any relevant user research or data
+5. Screenshots of existing Figma designs (if applicable)
+
+**B. Prompt Cursor**
+
+Use this template as a starting point:
+
+```
+I'm designing [feature name] for [product/company - e.g., "DoorDash Merchant Portal (web application)"]. 
+
+**Problem:** 
+[2-3 sentences: What's the security/business gap? What's the solution?]
+
+**Target Users:**
+[Role + behavioral context: How often do they do this? What device? What mindset?]
+
+**Key Design Principles:**
+[North Star principles for tone/framing - this guides all decisions]
+
+**Critical Challenges:**
+[Key tension or edge cases the design must address]
+
+---
+
+**CORE USER JOURNEYS TO DESIGN:**
+
+**Journey 1: [Name] ([WHEN it happens - e.g., "Before USV - Modal Interruption"])**
+- [Trigger/entry point]
+- Must communicate: [What user needs to understand - value props, timing, who, why]
+- [Key CTAs and their priority]
+- [Tone/framing notes]
+- [Supporting elements needed - e.g., links, visuals]
+
+**Journey 2: [Name] ([WHEN it happens])**
+- [Same structure as Journey 1]
+
+**Journey 3: [Name] ([WHEN it happens])**
+- [Same structure as Journey 1]
+
+**Supporting Screens:**
+- [Brief list of helper screens needed]
+
+---
+
+**UI Requirements:**
+- Platform: [web/mobile/desktop + primary viewport]
+- Design system: [Your company's design system]
+- Layout: [Key constraints - e.g., "Centered modals 400-500px width"]
+- States needed: [Default, hover, loading, success, error]
+
+---
+
+**ACCESSIBILITY CHECK (CRITICAL):**
+After generating designs, verify:
+- [ ] All text meets WCAG AA contrast requirements (4.5:1 for body text, 3:1 for large text)
+- [ ] Text is legible on all backgrounds
+- [ ] Button labels are descriptive and clear
+- [ ] Focus states are visible and obvious
+- [ ] No text is too small (minimum 14px for body, 16px recommended)
+- Use browser dev tools or contrast checker to validate all text/background combinations
+```
+
+**💡 Key Principles for Journey-Based Prompts:**
+
+1. **Focus on WHEN journeys happen**, not screen numbers
+2. **Describe WHAT must be communicated**, not exact copy
+3. **Specify GOALS**, not pixel-perfect layouts
+4. **Keep it concise** - aim for 1-2 pages max
+5. **One North Star principle** guides everything
+
+**C. Refine the Prompt**
+
+1. I will generate a Figma Make-compatible prompt
+2. Review it for accuracy and completeness
+3. Ask me to adjust if needed:
+   - "Can you add more detail about [specific aspect]?"
+   - "The tone should be more [formal/casual/technical]"
+   - "Include examples of [specific UI pattern]"
+
+**D. Save Your Prompt**
+
+1. Copy the final Figma Make prompt
+2. Save it to a document (you'll reuse and iterate on this)
+3. Keep track of the version (e.g., "Prompt v1")
+
+### Example Output:
+
+Your Cursor-generated Figma Make prompt should include:
+- Concise opening context (one sentence setting the stage)
+- Brief problem statement (2-3 sentences)
+- Target users with behavioral context
+- Clear design principles as North Star
+- Journey-based descriptions (WHEN they happen, WHAT to communicate)
+- Communication goals over pixel specs
+- Brief UI requirements at the end
+- Separate prompts for near-term and long-term versions
+
+### Verification:
+
+Before moving to Step 3, confirm:
+- ✅ Prompt is concise (1-2 pages, not a novel)
+- ✅ Prompt focuses on journeys and communication goals, not pixel specs
+- ✅ ONE clear North Star principle is stated
+- ✅ Journey triggers (WHEN) are clearly defined
+- ✅ Prompt is saved and versioned
+
+**What's Next:** Step 3 - Generate Designs with Figma Make
+
+---
+
+## Step 3 of 6: Generate Designs with Figma Make
+
+Use your AI-generated prompt to create design variations in Figma Make.
+
+### Manual Steps:
+
+**A. Access Figma Make & Set Up Design System**
+1. Go to Figma → Create new file
+2. Enable Figma Make (if not already enabled)
+3. Open the Figma Make panel
+4. **IMPORTANT - Select your design system library:**
+   - Click the **book icon** in the bottom corner of the Figma Make panel
+   - Select "Select library"
+   - Choose your design system (e.g., "Prism Components" for DoorDash)
+   - This ensures Figma Make uses your actual design system components
+
+**B. Add Visual References (Optional but Recommended)**
+1. If you have wireframes, sketches, or existing Figma screenshots, **add them as images** to your Figma Make prompt
+2. You can drag and drop images directly into the Figma Make prompt field
+3. Visual references help Figma Make understand:
+   - Layout structure
+   - Component placement
+   - Visual hierarchy
+   - Specific UI patterns you want
+4. Combine images with your text prompt for best results
+
+**C. Generate Near-Term Design**
+1. Paste your Figma Make prompt (near-term version) into the text field
+2. Add any wireframes/screenshots as visual references (see step B)
+3. Verify your design system library is selected (see step A)
+4. Click Generate
+5. Wait for Figma Make to create the design (typically 2-5 minutes)
+6. Review the output
+
+**D. Generate Long-Term Design**
+1. Paste your Figma Make prompt (long-term version)
+2. Add any wireframes/screenshots as visual references
+3. Verify your design system library is selected
+4. Click Generate
+5. Wait for generation (typically 2-5 minutes)
+6. Review the output
+
+**E. Initial Assessment**
+1. Do the designs match your intent?
+2. Are key components present?
+3. Is the layout logical?
+4. Does the long-term version show meaningful evolution?
+
+### Decision Point: Quality Check
+
+**If designs are off-target:**
+- Return to Step 2
+- Refine your prompt with Cursor
+- Be more specific about layout, components, or functionality
+- Regenerate
+
+**If designs are close but need tweaks:**
+- Proceed to Step 4
+- Note specific changes needed
+- You'll refine these manually
+
+**If designs hit the mark:**
+- Proceed to Step 4
+- Celebrate the quick win! 🎉
+
+### Tips for Success:
+
+- **Always select your design system library first** - Use the book icon to choose your components library
+- **Add visual references** - Drag and drop wireframes or screenshots into the prompt for better results
+- **Be specific:** "3-column layout" is better than "multi-column"
+- **Reference patterns:** "Similar to Airbnb's listing cards"
+- **Specify states:** "Include empty state, loading state, error state"
+- **Define hierarchy:** "Hero image at top, details below"
+
+**What's Next:** Step 4 - Create Interactive Prototypes
+
+---
+
+## Step 4 of 6: Create Interactive Prototypes
+
+Transform your AI-generated designs into clickable prototypes that demonstrate key interactions.
+
+### Manual Steps:
+
+**A. Integrate with Your Design System**
+1. Copy AI-generated designs into your company's Figma design system file
+2. Replace generic components with your actual design system components
+3. Update colors, typography, and spacing to match your system
+4. Keep the overall structure and layout from the AI generation
+
+**B. Add Interactivity**
+1. Identify key user flows and design challenges to demonstrate
+2. Create multiple frames for different states:
+   - Default state
+   - Hover states
+   - Active/selected states
+   - Success states
+   - Error states
+3. Use Figma's prototyping tools to link frames
+4. Add transitions and animations where helpful
+
+**C. Create Live Preview (If Applicable)**
+
+1. Identify fields that drive visual changes
+2. Use Figma variables or prototyping to show:
+   - Real-time updates as users type
+   - Preview of customer-facing view
+   - Changes across different contexts
+3. Link input fields to output displays
+
+**Examples:**
+- Edit SKU → Show Preview button
+- Type brand name → See it update live in phone preview
+- Change product image → See it reflect in customer view
+- Modify attributes → Watch the listing update
+
+**D. Prepare Two Versions for Presentation**
+
+1. **Near-Term Prototypes:**
+   - Addresses current product brief
+   - Shows immediately achievable functionality
+   - Uses existing design patterns
+
+2. **Long-Term Prototypes:**
+   - Incorporates opportunity areas
+   - Shows future-state thinking
+   - Includes strategic enhancements
+
+**E. Early Feasibility Review with Engineering & Product**
+
+Before going too deep into refinement, get early feedback on feasibility and business alignment:
+
+1. **Schedule a quick review** (30 minutes) with:
+   - Engineering lead or tech lead
+   - Product Manager
+   - Optional: Data Science if metrics are involved
+
+2. **Share the prototype** and walk through:
+   - Core user journeys
+   - Key interactions and states
+   - Any technical assumptions you've made
+
+3. **Ask critical questions:**
+   - "Is this technically feasible with our current stack?"
+   - "Are there any backend/API dependencies we need to scope?"
+   - "Does this align with our product roadmap?"
+   - "What's the rough level of effort (small/medium/large)?"
+   - "Are there any technical constraints I should design around?"
+
+4. **Document feedback:**
+   - Technical blockers or concerns
+   - Suggested simplifications for MVP
+   - Dependencies on other teams
+   - Timeline implications
+
+**Why this matters:** Finding out your design requires 6 months of backend work AFTER final designs are done is a bad surprise. Catch feasibility issues early.
+
+### Verification:
+
+Before moving to Step 5, ensure:
+- ✅ Key user flows are prototyped and clickable
+- ✅ Designs use your actual design system components
+- ✅ Interactive elements respond appropriately
+- ✅ Both near-term and long-term versions are ready
+- ✅ Any live preview functionality works smoothly
+
+### Pro Tips:
+
+- **Start simple:** Prototype the core flow first, add details later
+- **Show don't tell:** Interactive prototypes communicate better than static mocks
+- **Test it yourself:** Click through before sharing with stakeholders
+- **Add annotations:** Include notes for context if needed
+
+**What's Next:** Step 5 - Share with Stakeholders & Gather Feedback
+
+---
+
+## Step 5 of 6: Share with Stakeholders & Gather Feedback
+
+Present your designs to your PM and team to gather feedback and validate direction.
+
+### Manual Steps:
+
+**A. Prepare Your Presentation**
+
+1. **Create a presentation flow:**
+   - Start with the problem statement and brief
+   - Show your initial ideation (quickly)
+   - Present the near-term design
+   - Walk through the interactive prototype
+   - Present the long-term vision
+   - Highlight key opportunity areas
+
+2. **Frame your ask:**
+   - "Does the near-term design solve the immediate need?"
+   - "Are there any concerns or gaps?"
+   - "Which long-term opportunities resonate most?"
+   - "What should we prioritize?"
+
+**B. Schedule and Conduct the Review**
+
+1. Book time with your PM (30-45 minutes recommended)
+2. Include other key stakeholders if appropriate
+3. Share the Figma link in advance (optional)
+
+**During the meeting:**
+- Start with context (brief, problem, approach)
+- Demo the near-term prototype interactively
+- Highlight novel elements (e.g., live preview)
+- Show the long-term vision
+- Take notes on reactions and feedback
+
+**C. Document Feedback**
+
+Create a feedback log:
+- ✅ **Positive reactions:** What landed well?
+- 🤔 **Questions raised:** What needs clarification?
+- 🔄 **Change requests:** What needs to be modified?
+- 💡 **New ideas emerged:** What discussions unlocked?
+- 🎯 **Priorities identified:** What to focus on first?
+
+**Examples:**
+- PM loved the live preview concept
+- Discussion sparked about Dashers uploading photos
+- Team excited to include live preview in initial tool
+- Long-term vision helped align on future features
+
+### Decision Point: Next Steps
+
+**Path A: Iteration Needed**
+- Significant changes required
+- Return to Step 2 or Step 3
+- Refine prompts or manually adjust designs
+- Loop back to Step 5
+
+**Path B: Minor Refinements**
+- Overall direction approved
+- Small tweaks needed
+- Proceed to Step 6 (final refinement)
+
+**Path C: Strategic Enhancement**
+- Stakeholders want to see more
+- Opportunity to incorporate roadmap/strategy
+- Proceed to **Optional Loop: Strategic Iteration**
+
+### Verification:
+
+After stakeholder feedback, confirm:
+- ✅ Feedback is documented
+- ✅ Priority changes are identified
+- ✅ Next steps are clear
+- ✅ Buy-in achieved (even if iteration needed)
+
+**What's Next:** Step 5b - Prototype Testing (Validate Assumptions) OR Optional Loop: Strategic Iteration OR Step 6 - Refine for Implementation
+
+---
+
+## Step 5b: Prototype Testing (Validate Assumptions)
+
+**When to use this step:** Before committing to final designs, validate your assumptions with actual users. This is especially important for features that involve behavior change, security/trust decisions, or complex user journeys.
+
+### Manual Steps:
+
+**A. Create Prototype Testing Plan Document**
+
+1. Create a `_Prototype Testing for [Project Title].md` file in your project folder
+2. Document:
+   - **Core flows to test** - List each key journey
+   - **Intent of each flow** - What success looks like
+   - **Assumptions to test** - What are you uncertain about?
+   - **Research questions** - What do you need to learn?
+
+**B. Partner with a UX Researcher**
+
+1. **Draft a concise Slack message** requesting research support:
+
+```
+👋 Hey [Researcher name]! 
+
+[emoji] I'm working on [brief project description]. Would love your help testing some core assumptions before we build.
+
+**The ask:** 
+[What you need - e.g., "Test 3 key flows with 5-8 users"]
+
+**Timeline:** 
+Prototypes ready [date], hoping to test by [date]
+
+**Context:**
+- [Key challenge 1]
+- [Key challenge 2]
+- [Critical assumption you need to validate]
+
+**Prototype testing plan:** [Link to your testing plan document]
+
+I'll put some time on your calendar to chat about feasibility and timing? 🙏
+```
+
+2. **In the meeting with researcher:**
+   - Share your prototype and testing plan
+   - Walk through key flows and assumptions
+   - Discuss method (moderated testing, unmoderated, etc.)
+   - Align on timeline and participant criteria
+   - Document who will recruit, script, analyze
+
+**C. Conduct Testing**
+
+Work with researcher to:
+1. Recruit appropriate participants (match your target user profile)
+2. Test the interactive prototype
+3. Use think-aloud protocol to understand mental models
+4. Probe on trust, motivation, confusion points
+5. Capture quotes and key observations
+
+**D. Analyze and Document Results**
+
+In your prototype testing document, add:
+- **Key findings** - What did you learn?
+- **Validated assumptions** - What worked as expected?
+- **Invalidated assumptions** - What didn't work?
+- **Surprising insights** - What did you not expect?
+- **Quotes** - Compelling user statements
+
+**E. Document Next Steps**
+
+Based on testing results:
+
+**If flows test well:**
+- [ ] Refine copy based on feedback
+- [ ] Polish any confusing messaging
+- [ ] Note what to preserve in final designs
+- [ ] Proceed to Step 6 (final refinement)
+
+**If users are confused:**
+- [ ] Identify specific points of confusion
+- [ ] Iterate on messaging/visuals
+- [ ] Simplify or add clarity where needed
+- [ ] Consider retesting critical areas
+
+**If users resist the solution:**
+- [ ] Understand objections (time, trust, friction, etc.)
+- [ ] Adjust value proposition framing
+- [ ] Consider different incentive structures
+- [ ] May need to pivot approach - discuss with PM
+
+**If a critical assumption is invalidated:**
+- [ ] Escalate to Product immediately
+- [ ] Reassess solution approach
+- [ ] May need to return to Step 1 (discovery)
+
+### Verification:
+
+Before moving to Step 6, ensure:
+- ✅ Core assumptions have been tested with real users
+- ✅ Research findings are documented
+- ✅ You know what needs to change based on testing
+- ✅ Researcher partner has reviewed and aligned on findings
+- ✅ Product is aware of any major pivots needed
+
+**What's Next:** Step 6 - Refine for Implementation (with research-validated improvements)
+
+---
+
+## Optional Loop: Strategic Iteration
+
+**When to use this:** Your PM or stakeholders want to see how the design could evolve based on longer-term product strategy.
+
+### Manual Steps:
+
+**A. Gather Strategic Context**
+1. Request access to product roadmap documents
+2. Collect strategic planning materials (e.g., 2026 product plan)
+3. Note any new initiatives or priorities
+4. Identify how your feature fits into the bigger picture
+
+**B. Feed Strategy into Cursor**
+
+Use this template:
+
+```
+I previously created designs for [feature name]. Now I want to enhance the long-term vision based on our product strategy.
+
+**Original Prompt:** [Paste your previous Figma Make prompt]
+
+**Strategic Context:**
+[Paste relevant sections from roadmap/strategy docs]
+
+**New Opportunity Areas:**
+- [Strategic opportunity 1]
+- [Strategic opportunity 2]
+- [Strategic opportunity 3]
+
+**Request:** Please update the Figma Make prompt to incorporate these strategic opportunities into the long-term design vision.
+```
+
+**C. Generate Enhanced Long-Term Design**
+1. Get updated prompt from Cursor
+2. Return to Step 3: Generate new designs in Figma Make
+3. Focus on the long-term version with strategic enhancements
+4. Keep the near-term version stable (unless strategy affects it)
+
+**Example:**
+- Fed 2026 product plan into Cursor
+- Generated new Figma Make prompt
+- Created enhanced long-term vision showing:
+  - SKU impact and analytics dashboard
+  - A/B testing integration
+  - Overall SKU health scoring
+  - Chronological change history
+  - Quality metrics over time
+
+**D. Update Prototypes**
+1. Add new strategic features to long-term prototype
+2. Show how they integrate with existing design
+3. Demonstrate value of each strategic enhancement
+
+**E. Share Updated Vision**
+1. Schedule follow-up with stakeholders
+2. Show the evolution: "Here's how we can incorporate the 2026 roadmap..."
+3. Gather feedback on strategic direction
+4. Adjust priorities as needed
+
+### Return to Step 5
+
+After strategic iteration, loop back to Step 5 (Share with Stakeholders) to validate the enhanced vision.
+
+**Iteration is normal!** Multiple rounds of refinement are expected and valuable.
+
+**What's Next:** Once strategic vision is validated, proceed to Step 6
+
+---
+
+## Step 6 of 6: Refine for Implementation
+
+Polish your designs and prepare them for engineering handoff.
+
+### Manual Steps:
+
+**A. Final Design Refinement**
+
+Now that direction is approved, add the final polish:
+
+1. **Full design system integration:**
+   - Replace all remaining generic elements
+   - Ensure perfect compliance with design system
+   - Update spacing, sizing, and typography precisely
+   - Use actual component variants from your library
+
+2. **Responsive considerations:**
+   - Design for different screen sizes
+   - Show mobile, tablet, desktop variations (if applicable)
+   - Document breakpoints
+
+3. **Edge cases and states:**
+   - Empty states
+   - Loading states
+   - Error states
+   - Success confirmations
+   - Permissions/access states
+   - Long text/overflow scenarios
+
+4. **Accessibility:**
+   - Check color contrast
+   - Add proper labels for screen readers
+   - Document keyboard navigation
+   - Ensure focus states are clear
+
+**B. Pair with Content Design**
+
+**⚠️ CRITICAL:** AI-generated content is typically verbose, repetitive, and needs significant refinement. Do NOT ship AI copy as-is.
+
+1. **Schedule time with a Content Designer** As early in the process as possible.
+   
+2. **Review all copy together:**
+   - Modal/interstitial messaging
+   - Button labels and CTAs
+   - Helper text and tooltips
+   - Error messages
+   - Success confirmations
+   - Educational content
+
+3. **Refine for:**
+   - **Conciseness:** Cut unnecessary words
+   - **Clarity:** Remove ambiguity and jargon
+   - **Consistency:** Match voice and tone guidelines
+   - **Scannability:** Make it easy to skim
+   - **Accessibility:** Plain language, appropriate reading level
+   - **Brand voice:** Ensure it sounds like your company
+
+4. **Special attention for:**
+   - Security/trust messaging (avoid fear-based language)
+   - Instructions (make them actionable and specific)
+   - Repetitive content (AI loves to repeat itself - condense it)
+
+**Why this matters:** AI is great for ideation and creating "juice to squeeze" early on, but produces verbose, repetitive content. Content design polish is essential for refined flows ready for users.
+
+**C. Final Review**
+
+Before considering this complete:
+- ✅ All feedback incorporated (stakeholder + research)
+- ✅ Content design review completed and copy refined
+- ✅ Design system compliance verified
+- ✅ Edge cases designed
+- ✅ Accessibility checked (contrast, labels, focus states)
+- ✅ Developer handoff materials ready
+- ✅ Prototype updated with final designs
+- ✅ Success metrics defined and documented
+- ✅ Stakeholder sign-off received
+
+**What's Next:** Implementation & Iteration (or see "What's Next: Presenting Your Designs" at the end of this guide)
+
+---
+
+## 🎉 Workflow Complete!
+
+You've successfully used AI to accelerate your design process!
+
+### What You've Accomplished:
+
+- ✅ Defined success metrics upfront with Product and Data Science
+- ✅ Transformed a product brief into multiple design concepts (or created context from scratch through discovery)
+- ✅ Generated near-term and long-term visions quickly using AI
+- ✅ Created interactive prototypes to communicate ideas
+- ✅ Validated feasibility early with Engineering
+- ✅ Gathered stakeholder feedback and achieved alignment
+- ✅ Tested assumptions with real users through prototype testing
+- ✅ Refined AI-generated copy with Content Design
+- ✅ Ensured accessibility standards throughout
+- ✅ Optionally incorporated strategic planning into designs
+- ✅ Prepared polished, validated designs for implementation
+
+### Key Benefits of This Workflow:
+
+**Speed:** Complete this workflow in about 1-2 weeks vs. typical 3-4 weeks
+
+**Range:** Multiple design variations to explore different directions quickly
+
+**Communication:** Interactive prototypes unlock new conversations and ideas
+
+**Validation:** Early feasibility checks and user testing catch issues before building
+
+**Collaboration:** Structured touchpoints with Engineering, Research, Content, Product
+
+**Quality:** AI accelerates ideation; human expertise refines for production
+
+**Vision:** Long-term designs help align stakeholders on future opportunities
+
+**Flexibility:** Easy to iterate by updating prompts and regenerating
+
+**Measurement:** Success metrics defined upfront ensure you can prove impact
+
+**Breaking constraints:** AI helps break out of design system limitations during ideation
+
+---
+
+## 🎯 Ready to Present Your Designs?
+
+Now that your designs are complete, you'll need to present them effectively to get buy-in and move to implementation.
+
+**👉 See the section "What's Next: Presenting Your Designs" at the end of this guide** for how to use the `_Design-Presentation-Prep.mdc` companion workflow.
+
+---
+
+## Tips for Success
+
+### Working with Cursor:
+- Be specific about what you want
+- Provide context about your product and users
+- Iterate on prompts—don't expect perfection on first try
+- Save your prompts for reuse and refinement
+
+### Working with Figma Make:
+- Start broad, refine later
+- Generate multiple variations
+- Don't expect production-ready designs—expect inspiration
+- Use AI output as a starting point, not the end result
+
+### Stakeholder Communication:
+- Frame AI-generated designs as "rapid exploration"
+- Show the evolution: ideation → AI generation → refinement
+- Use prototypes to demonstrate interactions
+- Present both tactical and strategic visions
+
+### Iteration Strategy:
+- Early iterations: broad exploration
+- Mid iterations: refinement and focus
+- Late iterations: polish and edge cases
+- Always document feedback and decisions
+
+---
+
+## Common Challenges & Solutions
+
+### Challenge: AI-generated designs don't match your vision
+
+**Solution:**
+- Refine your prompt with more specific details
+- Show Cursor examples of what you want
+- Break down complex requests into smaller parts
+- Generate multiple variations and cherry-pick best elements
+
+### Challenge: Stakeholders want significant changes
+
+**Solution:**
+- Update your prompt to reflect feedback
+- Regenerate quickly (this is where AI shines!)
+- Show before/after to demonstrate responsiveness
+- Use rapid iteration as a selling point
+
+### Challenge: Long-term vision seems too ambitious
+
+**Solution:**
+- Break it into phases
+- Show how each phase builds on the previous
+- Tie features to business value
+- Use the roadmap to justify future-state thinking
+
+### Challenge: Design system constraints limit AI output
+
+**Solution:**
+- Use AI for initial ideation outside system constraints
+- Manually adapt back to design system in refinement phase
+- This is intentional—AI helps you think beyond current limitations
+
+### Challenge: I don't have a PRD or requirements yet
+
+**Solution:**
+- Use the Guided Discovery Questions in this workflow
+- Document what you know and what you need to learn
+- Create a stakeholder interview plan
+- Start designing with partial information and iterate as you learn more
+- It's okay to have gaps—design is a discovery process!
+
+---
+
+## Workflow at a Glance
+
+```
+Step 1: Discovery & Initial Ideation
+   ├─→ Have PRD? Extract context
+   ├─→ Have partial info? Extract + fill gaps with discovery questions
+   └─→ Starting fresh? Use Guided Discovery Questions
+   ↓
+Step 2: Generate AI Design Prompt (Cursor)
+   ↓
+Step 3: Generate Designs (Figma Make)
+   ↓
+Step 4: Create Interactive Prototypes
+   ↓
+Step 5: Share with Stakeholders
+   ↓
+   ├─→ Iteration needed? → Return to Step 2 or 3
+   ├─→ Strategic enhancement? → Optional Strategic Loop
+   └─→ Approved? → Continue
+   ↓
+Step 6: Refine for Implementation
+   ↓
+🎉 Complete!
+```
+
+---
+
+## Templates & Resources
+
+### Design Context Template
+
+**Note:** This template is automatically created when you start Option 1 (Discovery & Initial Ideation) in your project folder as `_Design Context for [Project Title].md`
+
+It includes structured sections for:
+- Core problem definition
+- User needs and business goals  
+- Constraints and unique challenges
+- Initial concepts and must-haves
+- Opportunity areas for future vision
+- Key user journeys to design for
+
+You can fill it out by pasting in PRDs, pointing to workspace files, going through guided discovery questions, or editing it directly.
+
+### Notes Holding Tank Template
+
+**Note:** This file is automatically created alongside your Design Context as `_Notes Holding Tank.md`
+
+**Purpose:** A low-friction "dump zone" for collecting information as you discover it over time.
+
+**How to use it:**
+- Open the file and paste anything relevant: meeting notes, Slack threads, emails, links, questions, observations
+- **Add most recent entries at the top** with a date
+- Don't worry about formatting or organizing - just collect!
+- When ready, come back to Cursor and say "Process my holding tank notes" to extract info into your Design Context
+
+**Why this matters:** Discovery happens over days/weeks. You shouldn't need to stay in one chat or remember everything. The holding tank lets you collect asynchronously and process when ready.
+
+### PRD Template
+
+**Note:** If you say you have a PRD, I will automatically create a `_PRD for [Project Title].md` file in your project folder.
+
+**To use:**
+1. Open the `_PRD for [Project Title].md` file I create
+2. Paste your PRD content directly into it
+3. **If your PRD has tables:** Save your PRD as a .md file first (most tools have "Export as Markdown" option), then paste that markdown. This preserves table formatting.
+4. I'll then read this file and extract key information to populate your Design Context template
+
+**Tip:** Keep the original PRD file in your project folder as a reference throughout the design process.
+
+### Stakeholder Interview Guide Template
+
+**Note:** If you're starting without documentation, I will automatically create a `_Stakeholder Interview Questions for [Project Title].md` file with tailored questions based on your knowledge gaps.
+
+This will include:
+- Questions organized by stakeholder type (PM, Engineering, Data, etc.)
+- What information each question will help you gather
+- Suggested follow-up questions
+- How to document what you learn
+
+### User Research vs Prototype Testing
+
+**Two separate files serve different purposes:**
+
+**`_User Research for [Project Title].md`** (Optional - for existing research)
+- Use this to paste in existing user research findings
+- Research that was done before you started designing
+- Customer interviews, surveys, analytics insights, etc.
+- Reference material to inform your design decisions
+- You create and populate this manually when you have prior research
+
+**`_Prototype Testing for [Project Title].md`** (Created in Step 5b)
+- I automatically create this when you reach Step 5b
+- Your plan for testing the designs YOU created
+- Documents what assumptions you need to validate
+- Includes testing plan, findings, and next steps
+- Forward-looking: "Will this design work?"
+
+**Key distinction:** User Research = past insights that inform design. Prototype Testing = validating your design works.
+
+### Journey-Based Prompt Template for Cursor
+
+**Use this template to create effective, concise Figma Make prompts:**
+
+```
+I'm designing [feature name] for [product/company - e.g., "DoorDash Merchant Portal (web application)"]. 
+
+**Problem:** 
+[2-3 sentences: What's the gap? What's the solution?]
+
+**Target Users:**
+[Role + behavioral context: How often? What device? What mindset?]
+
+**Key Design Principle:**
+[ONE North Star principle for tone/framing]
+
+**Critical Challenge:**
+[One key tension or edge case]
+
+---
+
+**CORE USER JOURNEYS TO DESIGN:**
+
+**Journey 1: [Name] ([WHEN it happens])**
+- [Trigger/entry point]
+- Must communicate: [value props, timing, who, why]
+- [Key CTAs: primary vs secondary]
+- [Tone/framing]
+- [Supporting elements: links, visuals, etc.]
+
+**Journey 2: [Name] ([WHEN it happens])**
+- [Same structure]
+
+**Journey 3: [Name] ([WHEN it happens])**
+- [Same structure]
+
+**Supporting Screens:**
+- [Brief list]
+
+---
+
+**UI Requirements:**
+- Platform: [web/mobile/desktop]
+- Design system: [Your design system]
+- Layout: [Key constraints]
+- States needed: [Default, hover, loading, success, error]
+
+---
+
+**ACCESSIBILITY CHECK (CRITICAL):**
+After generating designs, verify:
+- [ ] All text meets WCAG AA contrast requirements (4.5:1 for body text, 3:1 for large text)
+- [ ] Text is legible on all backgrounds
+- [ ] Button labels are descriptive and clear
+- [ ] Focus states are visible and obvious
+- [ ] No text is too small (minimum 14px for body, 16px recommended)
+- Use browser dev tools or contrast checker to validate all text/background combinations
+```
+
+**Remember:** Focus on WHAT to communicate and WHEN journeys happen, not pixel-perfect specs.
+
+### Feedback Capture Template
+
+```
+**Feature:** [Name]
+**Date:** [Date]
+**Attendees:** [Who was there]
+
+**What Landed Well:**
+- 
+- 
+
+**Questions Raised:**
+- 
+- 
+
+**Change Requests:**
+- 
+- 
+
+**New Ideas:**
+- 
+- 
+
+**Priorities:**
+1. 
+2. 
+3. 
+
+**Next Steps:**
+- [ ] 
+- [ ] 
+- [ ] 
+```
+
+### Handoff Checklist
+
+Use this before declaring Step 6 complete:
+
+**Design Quality:**
+- [ ] All screens designed for core journeys
+- [ ] All states designed (empty, loading, error, success)
+- [ ] Responsive variations created (if needed)
+- [ ] Design system components used throughout
+- [ ] Edge cases addressed
+- [ ] Spacing/sizing specified
+
+**Content & Accessibility:**
+- [ ] Content design review completed
+- [ ] AI-generated copy refined (concise, clear, on-brand)
+- [ ] Accessibility verified (contrast, labels, focus states)
+- [ ] All text meets WCAG AA standards
+
+**Collaboration & Validation:**
+- [ ] Engineering feasibility confirmed
+- [ ] Prototype testing completed (assumptions validated with users)
+- [ ] Success metrics defined and documented
+- [ ] Stakeholder feedback incorporated
+- [ ] Final stakeholder approval received
+
+**Handoff Materials:**
+- [ ] Interactions documented
+- [ ] Developer annotations added
+- [ ] Prototype updated with final designs
+- [ ] Testing findings shared with team
+- [ ] Success metrics dashboard planned
+
+---
+
+## 🚀 Ready to Start?
+
+ "How can I help you today?
+I can assist you with:
+ 1. 🎯 **Starting from scratch:** "I'm looking for help with discovery and ideation"
+ 2. 💬 **Generating prompts:** "Help me create a Figma Make prompt for [my feature]"
+ 3. 🔄 **Refining existing work:** "How do I improve my Figma Make designs..."
+ 4. 📋 **Feedback:** "Help me predict sticking points and feedback on key challenges"
+ 5. 🤔 **Answering questions:** "How do I handle [specific challenge]?"
+ 
+ What would you like to work on?"
+
+---
+
+## Advanced: Adapting This Workflow
+
+This workflow is flexible. Adapt it to your needs:
+
+### For Smaller Features:
+- Skip the long-term vision
+- Focus on Steps 1-2-3-5-6
+- Use AI for quick iteration, not strategic planning
+
+### For Exploratory Projects:
+- Generate many variations in Step 3
+- Spend more time in stakeholder feedback (Step 5)
+- Loop through strategic iteration multiple times
+- Keep refinement (Step 6) lightweight
+
+### For Complex Systems:
+- Break into multiple sub-workflows
+- Run Steps 1-5 for each major component
+- Synthesize in a final integration phase
+- Use AI to maintain consistency across components
+
+### Without Figma Make:
+- Use other AI tools (Midjourney, Galileo AI, etc.)
+- Adjust Step 3 accordingly
+- Core workflow structure remains the same
+
+### When Ramping Up on Existing Projects:
+- Use Guided Discovery Questions to understand current state
+- Schedule interviews with existing team members
+- Review existing designs and documentation
+- Document gaps and assumptions
+- Start with small iterations to build context
+
+---
+
+## 🎤 What's Next: Presenting Your Designs
+
+**You've completed the AI Design Workflow!** Your designs are polished, validated, and ready for implementation. 
+
+**But now you need to present them effectively to stakeholders, executives, or a broader team.**
+
+### 👉 Check out: `_Design-Presentation-Prep.mdc`
+
+This companion guide will help you:
+- **Frame your design narrative** - Tell a compelling story about the problem and solution
+- **Structure your presentation** - What to show, in what order, and why
+- **Handle challenging questions** - Prepare for pushback and edge case discussions
+- **Present different audiences** - Executives vs engineers vs designers
+- **Demonstrate impact** - Connect your design to business outcomes and metrics
+- **Build confidence** - Practice and preparation strategies
+
+**When to use it:**
+- Before major stakeholder reviews
+- Before design critiques
+- Before leadership presentations
+- Before XFN alignment meetings
+- Anytime you need to "sell" your design thinking
+
+**Pro tip:** Reference your Success Metrics dashboard and Prototype Testing findings during your presentation to demonstrate data-driven decision making.
+
+---
+
+## Questions?
+
+This workflow is meant to be adapted to your needs. Experiment, find what works, and share what you learn!
+
+**Remember:** "We're all just mapping new territory right now—figuring out what the map even looks like."
+
+Happy designing! ✨
