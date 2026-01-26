@@ -1,12 +1,14 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Card, Button, Typography, Space, Progress, Modal, message, Dropdown } from 'antd';
-import { CopyOutlined, CheckOutlined, RocketOutlined, ExportOutlined, DownOutlined } from '@ant-design/icons';
+import { Card, Button, Typography, Space, Progress, Modal, message, Dropdown, Alert, Tabs, Tag } from 'antd';
+import { CopyOutlined, CheckOutlined, RocketOutlined, ExportOutlined, DownOutlined, ScissorOutlined, DownloadOutlined, WarningOutlined } from '@ant-design/icons';
 import { PromptData } from '@/lib/types';
 import { generatePrompt, getCompletenessScore } from '@/lib/prompt-generator';
 import { generateCursorPrompt, getSafeFilename } from '@/lib/cursor-export';
 import type { PlatformType } from '@/lib/platform-types';
+import { PLATFORM_LIMITS, isOverLimit, getUsagePercent, formatCharCount } from '@/lib/prompt-limits';
+import { splitPrompt, PromptPart } from '@/lib/prompt-splitter';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -21,6 +23,8 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
   const [showEnhancedModal, setShowEnhancedModal] = useState(false);
   const [showEnhancePlatformModal, setShowEnhancePlatformModal] = useState(false);
   const [enhancedPlatform, setEnhancedPlatform] = useState<PlatformType>('figma-make');
+  const [splitParts, setSplitParts] = useState<PromptPart[]>([]);
+  const [showSplitModal, setShowSplitModal] = useState(false);
   
   const prompt = generatePrompt(data);
   const completeness = getCompletenessScore(data);
@@ -65,17 +69,30 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
         body: JSON.stringify({ prompt, platform }),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
-      if (data.error) {
-        message.error(data.error);
+      if (responseData.error) {
+        message.error(responseData.error);
         return;
       }
 
-      if (data.enhanced) {
-        setEnhancedPrompt(data.enhanced);
+      if (responseData.enhanced) {
+        setEnhancedPrompt(responseData.enhanced);
         setEnhancedPlatform(platform);
-        setShowEnhancedModal(true);
+        
+        // Check if prompt exceeds platform limit
+        if (isOverLimit(responseData.enhanced, platform)) {
+          const parts = splitPrompt(responseData.enhanced, platform);
+          setSplitParts(parts);
+          if (parts.length > 1) {
+            setShowSplitModal(true);
+          } else {
+            setShowEnhancedModal(true);
+          }
+        } else {
+          setSplitParts([]);
+          setShowEnhancedModal(true);
+        }
       }
     } catch {
       message.error('Failed to enhance prompt');
@@ -281,7 +298,7 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
       </Paragraph>
 
       <Modal
-        title={`AI-Enhanced Prompt (${enhancedPlatform})`}
+        title={`AI-Enhanced Prompt (${PLATFORM_LIMITS[enhancedPlatform]?.name || enhancedPlatform})`}
         open={showEnhancedModal}
         onCancel={() => setShowEnhancedModal(false)}
         width={800}
@@ -289,11 +306,41 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
           <Button key="cancel" onClick={() => setShowEnhancedModal(false)}>
             Cancel
           </Button>,
+          <Button key="download" icon={<DownloadOutlined />} onClick={() => {
+            if (enhancedPrompt) {
+              const filename = `${getSafeFilename(data)}-${enhancedPlatform}-enhanced.md`;
+              const blob = new Blob([enhancedPrompt], { type: 'text/markdown' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              message.success(`Downloaded ${filename}`);
+            }
+          }}>
+            Download
+          </Button>,
           <Button key="copy" type="primary" onClick={handleUseEnhanced}>
             Copy Enhanced Prompt
           </Button>,
         ]}
       >
+        {/* Character count and limit info */}
+        {enhancedPrompt && (
+          <div style={{ marginBottom: 12 }}>
+            <Space>
+              <Text type="secondary">
+                {formatCharCount(enhancedPrompt.length)} / {formatCharCount(PLATFORM_LIMITS[enhancedPlatform]?.maxChars || 0)} characters
+              </Text>
+              <Tag color={isOverLimit(enhancedPrompt, enhancedPlatform) ? 'error' : 'success'}>
+                {getUsagePercent(enhancedPrompt, enhancedPlatform)}% of limit
+              </Tag>
+            </Space>
+          </div>
+        )}
         <div 
           style={{ 
             background: '#141414', 
@@ -310,6 +357,127 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
           }}
         >
           {enhancedPrompt}
+        </div>
+      </Modal>
+
+      {/* Split Prompt Modal - shown when prompt exceeds limit */}
+      <Modal
+        title={
+          <Space>
+            <ScissorOutlined />
+            <span>Prompt Exceeds {PLATFORM_LIMITS[enhancedPlatform]?.name || enhancedPlatform} Limit</span>
+          </Space>
+        }
+        open={showSplitModal}
+        onCancel={() => setShowSplitModal(false)}
+        width={900}
+        footer={[
+          <Button key="cancel" onClick={() => setShowSplitModal(false)}>
+            Cancel
+          </Button>,
+          <Button key="view-full" onClick={() => {
+            setShowSplitModal(false);
+            setShowEnhancedModal(true);
+          }}>
+            View Full Prompt
+          </Button>,
+        ]}
+      >
+        <Alert
+          message={`Prompt is ${formatCharCount(enhancedPrompt?.length || 0)} characters (limit: ${formatCharCount(PLATFORM_LIMITS[enhancedPlatform]?.maxChars || 0)})`}
+          description={`We've split this into ${splitParts.length} parts. Use each part sequentially - tell the AI to ask for the next part when done.`}
+          type="warning"
+          icon={<WarningOutlined />}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+        
+        <Tabs
+          items={splitParts.map((part) => ({
+            key: String(part.partNumber),
+            label: (
+              <Space>
+                Part {part.partNumber}
+                <Tag>{formatCharCount(part.charCount)}</Tag>
+              </Space>
+            ),
+            children: (
+              <div>
+                <Space style={{ marginBottom: 12 }}>
+                  <Button 
+                    type="primary" 
+                    icon={<CopyOutlined />}
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(part.content);
+                      message.success(`Part ${part.partNumber} copied!`);
+                    }}
+                  >
+                    Copy Part {part.partNumber}
+                  </Button>
+                  <Button 
+                    icon={<DownloadOutlined />}
+                    onClick={() => {
+                      const filename = `${getSafeFilename(data)}-${enhancedPlatform}-part${part.partNumber}.md`;
+                      const blob = new Blob([part.content], { type: 'text/markdown' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = filename;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      message.success(`Downloaded ${filename}`);
+                    }}
+                  >
+                    Download Part {part.partNumber}
+                  </Button>
+                </Space>
+                <div 
+                  style={{ 
+                    background: '#141414', 
+                    padding: 16, 
+                    borderRadius: 6,
+                    border: '1px solid #424242',
+                    maxHeight: '40vh',
+                    overflow: 'auto',
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    lineHeight: 1.5,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                  }}
+                >
+                  {part.content}
+                </div>
+              </div>
+            ),
+          }))}
+        />
+        
+        <div style={{ marginTop: 16 }}>
+          <Button 
+            icon={<DownloadOutlined />}
+            onClick={() => {
+              // Download all parts as a zip or concatenated file
+              const allContent = splitParts.map(p => 
+                `${'='.repeat(60)}\nPART ${p.partNumber} OF ${p.totalParts}\n${'='.repeat(60)}\n\n${p.content}`
+              ).join('\n\n\n');
+              const filename = `${getSafeFilename(data)}-${enhancedPlatform}-all-parts.md`;
+              const blob = new Blob([allContent], { type: 'text/markdown' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              message.success(`Downloaded all parts`);
+            }}
+          >
+            Download All Parts
+          </Button>
         </div>
       </Modal>
 

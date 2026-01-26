@@ -1,20 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Layout, Typography, Splitter } from 'antd';
 import PromptForm from '@/components/PromptForm';
 import PromptPreview from '@/components/PromptPreview';
+import BrainDump from '@/components/BrainDump';
+import FollowupChat from '@/components/FollowupChat';
 import { PromptData, defaultPromptData } from '@/lib/types';
+import { ExtractedFields } from '@/lib/extract-types';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
 
 export default function Home() {
   const [promptData, setPromptData] = useState<PromptData>(defaultPromptData);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [brainDumpContext, setBrainDumpContext] = useState('');
+  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<ExtractedFields>({});
+  const [formKey, setFormKey] = useState(0); // Used to force form re-render with new values
 
-  const handleValuesChange = (_changedValues: Partial<PromptData>, allValues: PromptData) => {
+  const handleValuesChange = useCallback((_changedValues: Partial<PromptData>, allValues: PromptData) => {
     setPromptData(allValues);
-  };
+  }, []);
+
+  const handleBrainDumpExtracted = useCallback((
+    extractedData: PromptData, 
+    extractedSuggestions: ExtractedFields,
+    questions: string[],
+    brainDumpText: string
+  ) => {
+    setPromptData(extractedData);
+    setSuggestions(extractedSuggestions);
+    setFollowUpQuestions(questions);
+    setBrainDumpContext(brainDumpText);
+    setFormKey(prev => prev + 1); // Force form to re-initialize with new values
+  }, []);
+
+  const handleFollowUpFieldsUpdated = useCallback((
+    updatedData: PromptData,
+    updatedSuggestions: ExtractedFields
+  ) => {
+    setPromptData(updatedData);
+    setSuggestions(prev => ({ ...prev, ...updatedSuggestions }));
+    setFormKey(prev => prev + 1);
+  }, []);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -65,9 +95,44 @@ export default function Home() {
               overflow: 'auto',
               border: '1px solid #424242',
             }}>
+              {/* Brain Dump Section */}
+              <BrainDump
+                onExtracted={handleBrainDumpExtracted}
+                currentData={promptData}
+                isExtracting={isExtracting}
+                onStartExtract={() => {
+                  setIsExtracting(true);
+                }}
+                onFinishExtract={() => setIsExtracting(false)}
+              />
+
+              {/* Follow-up Chat (shown after extraction if there are questions) */}
+              {followUpQuestions.length > 0 && brainDumpContext && (
+                <FollowupChat
+                  initialQuestions={followUpQuestions}
+                  currentData={promptData}
+                  onFieldsUpdated={handleFollowUpFieldsUpdated}
+                  brainDumpContext={brainDumpContext}
+                />
+              )}
+
+              {/* Main Form */}
               <PromptForm 
+                key={formKey}
                 onValuesChange={handleValuesChange}
-                initialValues={defaultPromptData}
+                initialValues={promptData}
+                currentData={promptData}
+                suggestions={suggestions}
+                onApplySuggestion={(field, value) => {
+                  const newData = { ...promptData, [field]: value };
+                  setPromptData(newData);
+                  setSuggestions(prev => {
+                    const updated = { ...prev };
+                    delete (updated as Record<string, unknown>)[field];
+                    return updated;
+                  });
+                  setFormKey(prev => prev + 1);
+                }}
               />
             </div>
           </Splitter.Panel>

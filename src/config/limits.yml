@@ -1,0 +1,25 @@
+# Platform prompt length limits
+# These are conservative defaults since exact limits aren't publicly documented
+# Adjust as needed based on testing with each platform
+
+platforms:
+  figma-make:
+    name: "Figma Make"
+    # Figma Make has a prompt input field - conservatively limiting to ~8k chars
+    maxChars: 8000
+    # Split by major sections: journeys, then supporting screens, then UI requirements
+    splitStrategy: "sections"
+    
+  lovable:
+    name: "Lovable"
+    # Lovable accepts longer prompts for full-stack generation
+    maxChars: 15000
+    # Split by feature blocks
+    splitStrategy: "features"
+    
+  cursor:
+    name: "Cursor"
+    # Cursor has larger context windows, can handle longer prompts
+    maxChars: 25000
+    # Split by implementation phases
+    splitStrategy: "phases"
