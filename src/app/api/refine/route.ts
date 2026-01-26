@@ -1,15 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getPlatformConfig } from '@/lib/platform-config';
+import type { PlatformType } from '@/lib/platform-types';
 
 // AI refinement endpoint
 // This will enhance prompts using an LLM API
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    const body = await request.json();
+    const prompt: string | undefined = body?.prompt;
+    const platform: PlatformType = (body?.platform ?? 'figma-make') as PlatformType;
 
     if (!prompt) {
       return NextResponse.json(
         { error: 'Prompt is required' },
+        { status: 400 }
+      );
+    }
+
+    let systemPrompt: string;
+    try {
+      const platformConfig = await getPlatformConfig(platform);
+      systemPrompt = platformConfig.systemPrompt;
+    } catch {
+      return NextResponse.json(
+        { error: `Unknown platform: ${platform}` },
         { status: 400 }
       );
     }
@@ -39,21 +54,11 @@ export async function POST(request: NextRequest) {
         messages: [
           {
             role: 'system',
-            content: `You are an expert UX designer and prompt engineer. Your task is to enhance Figma Make prompts to be more effective and complete.
-
-When enhancing a prompt:
-1. Make descriptions more specific and actionable
-2. Add missing details that would help Figma Make generate better designs
-3. Ensure the tone is consistent throughout
-4. Keep the same structure and format
-5. Don't add content that contradicts what the user provided
-6. Focus on clarity and completeness
-
-Return ONLY the enhanced prompt, maintaining the exact same markdown format.`,
+            content: systemPrompt,
           },
           {
             role: 'user',
-            content: `Please enhance this Figma Make prompt to be more specific, complete, and effective:\n\n${prompt}`,
+            content: `PLATFORM: ${platform}\n\nRAW PROMPT:\n\n${prompt}`,
           },
         ],
         temperature: 0.7,
@@ -74,6 +79,7 @@ Return ONLY the enhanced prompt, maintaining the exact same markdown format.`,
 
     return NextResponse.json({
       original: prompt,
+      platform,
       enhanced: enhancedPrompt,
       success: true,
     });

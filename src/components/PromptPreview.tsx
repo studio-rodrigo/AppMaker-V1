@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, Button, Typography, Space, Progress, Modal, message, Dropdown } from 'antd';
 import { CopyOutlined, CheckOutlined, RocketOutlined, ExportOutlined, DownOutlined } from '@ant-design/icons';
 import { PromptData } from '@/lib/types';
 import { generatePrompt, getCompletenessScore } from '@/lib/prompt-generator';
 import { generateCursorPrompt, getSafeFilename } from '@/lib/cursor-export';
+import type { PlatformType } from '@/lib/platform-types';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -18,9 +19,31 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [enhancedPrompt, setEnhancedPrompt] = useState<string | null>(null);
   const [showEnhancedModal, setShowEnhancedModal] = useState(false);
+  const [showEnhancePlatformModal, setShowEnhancePlatformModal] = useState(false);
+  const [enhancedPlatform, setEnhancedPlatform] = useState<PlatformType>('figma-make');
   
   const prompt = generatePrompt(data);
   const completeness = getCompletenessScore(data);
+
+  const platformOptions = useMemo(() => {
+    return [
+      {
+        key: 'figma-make' as const,
+        name: 'Figma Make',
+        description: 'Enhance for Figma Make (keeps MDC structure)',
+      },
+      {
+        key: 'lovable' as const,
+        name: 'Lovable',
+        description: 'Transform into a full-stack build spec',
+      },
+      {
+        key: 'cursor' as const,
+        name: 'Cursor',
+        description: 'Transform into implementation instructions',
+      },
+    ];
+  }, []);
 
   const handleCopy = async (textToCopy?: string) => {
     try {
@@ -33,13 +56,13 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
     }
   };
 
-  const handleEnhance = async () => {
+  const requestEnhance = async (platform: PlatformType) => {
     setIsEnhancing(true);
     try {
       const response = await fetch('/api/refine', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, platform }),
       });
 
       const data = await response.json();
@@ -51,6 +74,7 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
 
       if (data.enhanced) {
         setEnhancedPrompt(data.enhanced);
+        setEnhancedPlatform(platform);
         setShowEnhancedModal(true);
       }
     } catch {
@@ -58,6 +82,15 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
     } finally {
       setIsEnhancing(false);
     }
+  };
+
+  const handleEnhanceClick = () => {
+    setShowEnhancePlatformModal(true);
+  };
+
+  const handleEnhancePlatformSelect = async (platform: PlatformType) => {
+    setShowEnhancePlatformModal(false);
+    await requestEnhance(platform);
   };
 
   const handleUseEnhanced = async () => {
@@ -190,7 +223,7 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
           </Dropdown>
           <Button
             icon={<RocketOutlined />}
-            onClick={handleEnhance}
+            onClick={handleEnhanceClick}
             loading={isEnhancing}
           >
             Enhance
@@ -248,7 +281,7 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
       </Paragraph>
 
       <Modal
-        title="AI-Enhanced Prompt"
+        title={`AI-Enhanced Prompt (${enhancedPlatform})`}
         open={showEnhancedModal}
         onCancel={() => setShowEnhancedModal(false)}
         width={800}
@@ -278,6 +311,30 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
         >
           {enhancedPrompt}
         </div>
+      </Modal>
+
+      <Modal
+        title="Enhance for..."
+        open={showEnhancePlatformModal}
+        onCancel={() => setShowEnhancePlatformModal(false)}
+        footer={null}
+        width={560}
+      >
+        <Space direction="vertical" style={{ width: '100%' }} size={12}>
+          {platformOptions.map((p) => (
+            <Card
+              key={p.key}
+              hoverable
+              onClick={() => handleEnhancePlatformSelect(p.key)}
+              styles={{ body: { padding: 16 } }}
+            >
+              <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                <Text strong>{p.name}</Text>
+                <Text type="secondary">{p.description}</Text>
+              </Space>
+            </Card>
+          ))}
+        </Space>
       </Modal>
     </Card>
   );
