@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Input, Button, Typography, Space, Alert, Tag, Tooltip, Collapse } from 'antd';
-import { BulbOutlined, ThunderboltOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Input, Button, Typography, Space, Alert, Tag, Tooltip, Collapse } from 'antd';
+import { ThunderboltOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { ExtractionResult, ExtractedFields, FieldExtraction, getConfidenceLevel, getConfidenceColor } from '@/lib/extract-types';
 import { PromptData } from '@/lib/types';
 import { applyExtractedFields, getSuggestedFields } from '@/lib/apply-extract';
@@ -96,15 +96,7 @@ export default function BrainDump({
   };
 
   return (
-    <Card
-      title={
-        <Space>
-          <BulbOutlined />
-          <span>Brain Dump</span>
-        </Space>
-      }
-      style={{ marginBottom: 16 }}
-    >
+    <div>
       <Alert
         message="Start with a brain dump"
         description="Write everything you know about your project in plain text. The AI will extract structured information and fill in the form fields automatically. You can then refine the results."
@@ -212,6 +204,6 @@ Don't worry about structure - just dump your thoughts!`}
           )}
         </div>
       )}
-    </Card>
+    </div>
   );
 }

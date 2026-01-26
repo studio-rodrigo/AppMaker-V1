@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Layout, Typography, Splitter } from 'antd';
+import { Layout, Typography, Splitter, Collapse } from 'antd';
+import { BulbOutlined, MessageOutlined } from '@ant-design/icons';
 import PromptForm from '@/components/PromptForm';
 import PromptPreview from '@/components/PromptPreview';
 import BrainDump from '@/components/BrainDump';
@@ -55,20 +56,31 @@ export default function Home() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '16px 24px',
+          padding: '12px 24px',
           height: 'auto',
           lineHeight: 'normal',
         }}
       >
-        <div>
-          <Text style={{ fontSize: 16, color: '#2444EC', fontWeight: 500 }}>
-            Rodrigo Labs: App Maker
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Text style={{ fontSize: 18, color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>
+            App Maker
           </Text>
-          {' '}
-          <Text type="secondary" style={{ fontSize: 14 }}>
-            [Generate structured prompts for AI-powered design]
+          <Text 
+            style={{ 
+              fontSize: 11, 
+              color: '#2444EC', 
+              fontWeight: 600,
+              padding: '3px 8px',
+              border: '1px solid #2444EC',
+              borderRadius: 4,
+            }}
+          >
+            Rodrigo Labs
           </Text>
         </div>
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          Generate structured prompts for AI-powered design
+        </Text>
       </Header>
 
       <Content style={{ padding: 24, background: '#141414' }}>
@@ -88,33 +100,53 @@ export default function Home() {
             }}
           >
             <div style={{ 
-              background: '#1f1f1f', 
-              padding: 24, 
-              borderRadius: 8,
               height: '100%',
               overflow: 'auto',
-              border: '1px solid #424242',
             }}>
-              {/* Brain Dump Section */}
-              <BrainDump
-                onExtracted={handleBrainDumpExtracted}
-                currentData={promptData}
-                isExtracting={isExtracting}
-                onStartExtract={() => {
-                  setIsExtracting(true);
-                }}
-                onFinishExtract={() => setIsExtracting(false)}
+              {/* Brain Dump & Follow-up Sections */}
+              <Collapse
+                defaultActiveKey={['brain-dump']}
+                style={{ marginBottom: 16 }}
+                items={[
+                  {
+                    key: 'brain-dump',
+                    label: (
+                      <span>
+                        <BulbOutlined style={{ marginRight: 8 }} />
+                        Brain Dump
+                      </span>
+                    ),
+                    children: (
+                      <BrainDump
+                        onExtracted={handleBrainDumpExtracted}
+                        currentData={promptData}
+                        isExtracting={isExtracting}
+                        onStartExtract={() => {
+                          setIsExtracting(true);
+                        }}
+                        onFinishExtract={() => setIsExtracting(false)}
+                      />
+                    ),
+                  },
+                  ...(followUpQuestions.length > 0 && brainDumpContext ? [{
+                    key: 'follow-up',
+                    label: (
+                      <span>
+                        <MessageOutlined style={{ marginRight: 8 }} />
+                        Follow-up Questions
+                      </span>
+                    ),
+                    children: (
+                      <FollowupChat
+                        initialQuestions={followUpQuestions}
+                        currentData={promptData}
+                        onFieldsUpdated={handleFollowUpFieldsUpdated}
+                        brainDumpContext={brainDumpContext}
+                      />
+                    ),
+                  }] : []),
+                ]}
               />
-
-              {/* Follow-up Chat (shown after extraction if there are questions) */}
-              {followUpQuestions.length > 0 && brainDumpContext && (
-                <FollowupChat
-                  initialQuestions={followUpQuestions}
-                  currentData={promptData}
-                  onFieldsUpdated={handleFollowUpFieldsUpdated}
-                  brainDumpContext={brainDumpContext}
-                />
-              )}
 
               {/* Main Form */}
               <PromptForm 

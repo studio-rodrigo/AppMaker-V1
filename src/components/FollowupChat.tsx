@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Card, Input, Button, Typography, Space, List, Tag } from 'antd';
-import { SendOutlined, MessageOutlined, RobotOutlined, UserOutlined } from '@ant-design/icons';
+import { Input, Button, Typography, Space, List, Tag } from 'antd';
+import { SendOutlined, RobotOutlined, UserOutlined } from '@ant-design/icons';
 import { ChatMessage, ExtractionResult, ExtractedFields } from '@/lib/extract-types';
 import { PromptData } from '@/lib/types';
 import { applyExtractedFields, getSuggestedFields } from '@/lib/apply-extract';
@@ -112,16 +112,7 @@ export default function FollowupChat({
   }
 
   return (
-    <Card
-      title={
-        <Space>
-          <MessageOutlined />
-          <span>Follow-up Questions</span>
-        </Space>
-      }
-      style={{ marginBottom: 16 }}
-      styles={{ body: { padding: 16 } }}
-    >
+    <div>
       <div style={{ 
         maxHeight: 300, 
         overflowY: 'auto', 
@@ -209,6 +200,6 @@ export default function FollowupChat({
       <Paragraph type="secondary" style={{ fontSize: 11, marginTop: 8, marginBottom: 0 }}>
         Press Enter to send, Shift+Enter for new line
       </Paragraph>
-    </Card>
+    </div>
   );
 }
