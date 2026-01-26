@@ -163,7 +163,7 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
 
       // Handle horizontal rules
       if (line === '---') {
-        return <hr key={index} style={{ border: 'none', borderTop: '1px solid #e8e8e8', margin: '12px 0' }} />;
+        return <hr key={index} style={{ border: 'none', borderTop: '1px solid #424242', margin: '12px 0' }} />;
       }
 
       return (
@@ -178,7 +178,7 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
     <Card
       title={
         <Space>
-          <Title level={5} style={{ margin: 0 }}>Generated Prompt</Title>
+          <Title level={5} style={{ margin: 0, color: 'rgba(255, 255, 255, 0.85)' }}>Generated Prompt</Title>
         </Space>
       }
       extra={
@@ -227,12 +227,13 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
       <div 
         className="prompt-preview"
         style={{ 
-          background: '#1a1a1a', 
+          background: '#141414', 
           padding: 16, 
           borderRadius: 6,
-          border: '1px solid #303030',
+          border: '1px solid #424242',
           fontSize: 13,
           lineHeight: 1.6,
+          color: 'rgba(255, 255, 255, 0.85)',
         }}
       >
         {renderPromptPreview()}
@@ -262,16 +263,17 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
       >
         <div 
           style={{ 
-            background: '#1a1a1a', 
+            background: '#141414', 
             padding: 16, 
             borderRadius: 6,
-            border: '1px solid #303030',
+            border: '1px solid #424242',
             maxHeight: '60vh',
             overflow: 'auto',
             whiteSpace: 'pre-wrap',
             fontFamily: 'monospace',
             fontSize: 13,
             lineHeight: 1.6,
+            color: 'rgba(255, 255, 255, 0.85)',
           }}
         >
           {enhancedPrompt}

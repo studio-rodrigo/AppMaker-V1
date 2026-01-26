@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ConfigProvider, theme } from 'antd';
+import ThemeProvider from '@/components/ThemeProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -17,17 +17,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AntdRegistry>
-          <ConfigProvider
-            theme={{
-              algorithm: theme.darkAlgorithm,
-              token: {
-                colorPrimary: '#2444EC',
-                borderRadius: 6,
-              },
-            }}
-          >
+          <ThemeProvider>
             {children}
-          </ConfigProvider>
+          </ThemeProvider>
         </AntdRegistry>
       </body>
     </html>

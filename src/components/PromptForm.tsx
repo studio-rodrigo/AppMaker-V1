@@ -61,7 +61,6 @@ export default function PromptForm({ onValuesChange, initialValues }: PromptForm
       <Collapse 
         defaultActiveKey={['1', '2', '3']} 
         items={collapseItems}
-        style={{ background: 'white' }}
         accordion={false}
       />
     </Form>

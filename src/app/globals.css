@@ -9,12 +9,12 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #141414;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 body {
-  background-color: #0a0a0a;
   min-height: 100vh;
-  color: #fff;
 }
 
 /* Markdown preview styling */
@@ -24,6 +24,7 @@ body {
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .prompt-preview strong {
@@ -31,35 +32,9 @@ body {
   color: #2444EC;
 }
 
-/* Ant Design overrides for dark mode */
-.ant-card {
-  background: #141414 !important;
-  border-color: #303030 !important;
-}
-
-.ant-collapse {
-  background: #141414 !important;
-  border-color: #303030 !important;
-}
-
-.ant-collapse > .ant-collapse-item {
-  border-color: #303030 !important;
-}
-
-.ant-collapse > .ant-collapse-item > .ant-collapse-header {
-  font-weight: 500;
-}
-
-.ant-collapse-content {
-  background: #1a1a1a !important;
-  border-color: #303030 !important;
-}
-
 /* Journey card styling */
 .journey-card {
   margin-bottom: 16px;
-  border: 1px solid #303030 !important;
-  background: #1a1a1a !important;
 }
 
 .journey-card:hover {
@@ -78,13 +53,4 @@ body {
 /* Copy button success state */
 .copy-success {
   color: #52c41a !important;
-}
-
-/* Splitter styling for dark mode */
-.ant-splitter-bar {
-  background: #303030 !important;
-}
-
-.ant-splitter-bar:hover {
-  background: #2444EC !important;
 }

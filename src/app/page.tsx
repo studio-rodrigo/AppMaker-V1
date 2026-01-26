@@ -7,7 +7,7 @@ import PromptPreview from '@/components/PromptPreview';
 import { PromptData, defaultPromptData } from '@/lib/types';
 
 const { Header, Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 export default function Home() {
   const [promptData, setPromptData] = useState<PromptData>(defaultPromptData);
@@ -20,8 +20,8 @@ export default function Home() {
     <Layout style={{ minHeight: '100vh' }}>
       <Header 
         style={{ 
-          background: '#141414', 
-          borderBottom: '1px solid #303030',
+          background: '#1f1f1f', 
+          borderBottom: '1px solid #424242',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -31,19 +31,20 @@ export default function Home() {
         }}
       >
         <div>
-          <Title level={4} style={{ margin: 0, color: '#2444EC', lineHeight: 1.4 }}>
+          <Text style={{ fontSize: 16, color: '#2444EC', fontWeight: 500 }}>
             Rodrigo Labs: App Maker
-          </Title>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            Generate structured prompts for AI-powered design
+          </Text>
+          {' '}
+          <Text type="secondary" style={{ fontSize: 14 }}>
+            [Generate structured prompts for AI-powered design]
           </Text>
         </div>
       </Header>
 
-      <Content style={{ padding: 24, background: '#0a0a0a' }}>
+      <Content style={{ padding: 24, background: '#141414' }}>
         <Splitter
           style={{ 
-            height: 'calc(100vh - 140px)',
+            height: 'calc(100vh - 100px)',
             background: 'transparent',
           }}
         >
@@ -57,12 +58,12 @@ export default function Home() {
             }}
           >
             <div style={{ 
-              background: '#141414', 
+              background: '#1f1f1f', 
               padding: 24, 
               borderRadius: 8,
               height: '100%',
               overflow: 'auto',
-              border: '1px solid #303030',
+              border: '1px solid #424242',
             }}>
               <PromptForm 
                 onValuesChange={handleValuesChange}
