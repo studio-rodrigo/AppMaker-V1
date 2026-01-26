@@ -23,14 +23,14 @@ export default function PromptForm({ onValuesChange, initialValues }: PromptForm
 
   const collapseItems = [
     {
-      key: '0',
-      label: 'PRD / Product Brief (Optional)',
-      children: <PRDInput />,
-    },
-    {
       key: '1',
       label: 'Project Context',
       children: <ProjectContext />,
+    },
+    {
+      key: '0',
+      label: 'PRD / Product Brief (Optional)',
+      children: <PRDInput />,
     },
     {
       key: '2',
