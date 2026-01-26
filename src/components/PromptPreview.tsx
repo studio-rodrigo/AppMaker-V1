@@ -227,10 +227,10 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
       <div 
         className="prompt-preview"
         style={{ 
-          background: '#fafafa', 
+          background: '#1a1a1a', 
           padding: 16, 
           borderRadius: 6,
-          border: '1px solid #f0f0f0',
+          border: '1px solid #303030',
           fontSize: 13,
           lineHeight: 1.6,
         }}
@@ -262,10 +262,10 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
       >
         <div 
           style={{ 
-            background: '#fafafa', 
+            background: '#1a1a1a', 
             padding: 16, 
             borderRadius: 6,
-            border: '1px solid #f0f0f0',
+            border: '1px solid #303030',
             maxHeight: '60vh',
             overflow: 'auto',
             whiteSpace: 'pre-wrap',

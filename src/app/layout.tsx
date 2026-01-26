@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Figma Make Prompt Generator',
+  title: 'Rodrigo Labs: App Maker',
   description: 'AI-powered tool to generate structured Figma Make prompts',
 };
 
@@ -19,8 +19,9 @@ export default function RootLayout({
         <AntdRegistry>
           <ConfigProvider
             theme={{
+              algorithm: theme.darkAlgorithm,
               token: {
-                colorPrimary: '#1677ff',
+                colorPrimary: '#2444EC',
                 borderRadius: 6,
               },
             }}

@@ -12,8 +12,9 @@ body {
 }
 
 body {
-  background-color: #f5f5f5;
+  background-color: #0a0a0a;
   min-height: 100vh;
+  color: #fff;
 }
 
 /* Markdown preview styling */
@@ -27,26 +28,42 @@ body {
 
 .prompt-preview strong {
   font-weight: 600;
-  color: #1677ff;
+  color: #2444EC;
 }
 
-/* Ant Design overrides */
+/* Ant Design overrides for dark mode */
 .ant-card {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  background: #141414 !important;
+  border-color: #303030 !important;
+}
+
+.ant-collapse {
+  background: #141414 !important;
+  border-color: #303030 !important;
+}
+
+.ant-collapse > .ant-collapse-item {
+  border-color: #303030 !important;
 }
 
 .ant-collapse > .ant-collapse-item > .ant-collapse-header {
   font-weight: 500;
 }
 
+.ant-collapse-content {
+  background: #1a1a1a !important;
+  border-color: #303030 !important;
+}
+
 /* Journey card styling */
 .journey-card {
   margin-bottom: 16px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #303030 !important;
+  background: #1a1a1a !important;
 }
 
 .journey-card:hover {
-  border-color: #1677ff;
+  border-color: #2444EC !important;
 }
 
 /* Form section headers */
@@ -55,10 +72,19 @@ body {
   align-items: center;
   gap: 8px;
   margin-bottom: 16px;
-  color: #1677ff;
+  color: #2444EC;
 }
 
 /* Copy button success state */
 .copy-success {
   color: #52c41a !important;
+}
+
+/* Splitter styling for dark mode */
+.ant-splitter-bar {
+  background: #303030 !important;
+}
+
+.ant-splitter-bar:hover {
+  background: #2444EC !important;
 }

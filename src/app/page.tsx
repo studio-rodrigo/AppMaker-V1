@@ -20,17 +20,19 @@ export default function Home() {
     <Layout style={{ minHeight: '100vh' }}>
       <Header 
         style={{ 
-          background: 'white', 
-          borderBottom: '1px solid #f0f0f0',
+          background: '#141414', 
+          borderBottom: '1px solid #303030',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 24px',
+          padding: '16px 24px',
+          height: 'auto',
+          lineHeight: 'normal',
         }}
       >
         <div>
-          <Title level={4} style={{ margin: 0, color: '#1677ff' }}>
-            Figma Make Prompt Generator
+          <Title level={4} style={{ margin: 0, color: '#2444EC', lineHeight: 1.4 }}>
+            Rodrigo Labs: App Maker
           </Title>
           <Text type="secondary" style={{ fontSize: 12 }}>
             Generate structured prompts for AI-powered design
@@ -38,10 +40,10 @@ export default function Home() {
         </div>
       </Header>
 
-      <Content style={{ padding: 24, background: '#f5f5f5' }}>
+      <Content style={{ padding: 24, background: '#0a0a0a' }}>
         <Splitter
           style={{ 
-            height: 'calc(100vh - 120px)',
+            height: 'calc(100vh - 140px)',
             background: 'transparent',
           }}
         >
@@ -55,11 +57,12 @@ export default function Home() {
             }}
           >
             <div style={{ 
-              background: 'white', 
+              background: '#141414', 
               padding: 24, 
               borderRadius: 8,
               height: '100%',
               overflow: 'auto',
+              border: '1px solid #303030',
             }}>
               <PromptForm 
                 onValuesChange={handleValuesChange}

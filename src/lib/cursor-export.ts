@@ -162,7 +162,7 @@ function getPlatformDescription(platform: string): string {
  * Generate a filename-safe version of the feature name
  */
 export function getSafeFilename(data: PromptData): string {
-  const name = data.featureName || 'cursor-prompt';
+  const name = data.featureName || 'rodrigo-labs-prompt';
   return name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
