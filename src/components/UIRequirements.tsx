@@ -26,14 +26,6 @@ export default function UIRequirements() {
       </Form.Item>
 
       <Form.Item
-        label="Design System"
-        name="designSystem"
-        tooltip="Your company's design system or component library"
-      >
-        <Input placeholder="e.g., Prism Components, Material Design, Custom System" />
-      </Form.Item>
-
-      <Form.Item
         label="Layout Constraints"
         name="layoutConstraints"
         tooltip="Key layout requirements (e.g., modal width, responsive breakpoints)"

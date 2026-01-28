@@ -1,12 +1,97 @@
 'use client';
 
 import { Form, Input, Button, Card, Space, Typography } from 'antd';
-import { PlusOutlined, DeleteOutlined, NodeIndexOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, NodeIndexOutlined, CompassOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
 
-export default function JourneyBuilder() {
+interface JourneyBuilderProps {
+  simplified?: boolean;
+}
+
+export default function JourneyBuilder({ simplified = false }: JourneyBuilderProps) {
+  // Simplified journey builder for idea exploration
+  if (simplified) {
+    return (
+      <div>
+        <div className="section-title">
+          <CompassOutlined />
+          <Title level={5} style={{ margin: 0 }}>User Journeys (Optional)</Title>
+        </div>
+        
+        <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
+          Describe key moments users will experience. Keep it light - just capture the essence.
+        </Text>
+
+        <Form.List name="journeys">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }, index) => (
+                <Card
+                  key={key}
+                  className="journey-card"
+                  size="small"
+                  title={<Text strong>Flow {index + 1}</Text>}
+                  extra={
+                    fields.length > 1 && (
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => remove(name)}
+                        size="small"
+                      >
+                        Remove
+                      </Button>
+                    )
+                  }
+                  style={{ marginBottom: 12 }}
+                >
+                  <Form.Item
+                    {...restField}
+                    label="What happens?"
+                    name={[name, 'name']}
+                    style={{ marginBottom: 12 }}
+                  >
+                    <Input placeholder="e.g., User signs up, User creates first project" />
+                  </Form.Item>
+
+                  <Form.Item
+                    {...restField}
+                    label="Key moment"
+                    name={[name, 'mustCommunicate']}
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input placeholder="e.g., Show value immediately, Make it feel easy" />
+                  </Form.Item>
+                </Card>
+              ))}
+
+              <Button
+                type="dashed"
+                onClick={() => add({
+                  name: '',
+                  when: '',
+                  trigger: '',
+                  mustCommunicate: '',
+                  ctas: '',
+                  tone: '',
+                  supportingElements: '',
+                })}
+                block
+                icon={<PlusOutlined />}
+              >
+                Add Flow
+              </Button>
+            </>
+          )}
+        </Form.List>
+      </div>
+    );
+  }
+
+  // Full journey builder
   return (
     <div>
       <div className="section-title">

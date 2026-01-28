@@ -1,12 +1,58 @@
 'use client';
 
 import { Form, Input, Typography } from 'antd';
-import { ProjectOutlined } from '@ant-design/icons';
+import { ProjectOutlined, BulbOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
-export default function ProjectContext() {
+interface ProjectContextProps {
+  simplified?: boolean;
+}
+
+export default function ProjectContext({ simplified = false }: ProjectContextProps) {
+  // Simplified "Quick Context" mode for idea exploration
+  if (simplified) {
+    return (
+      <div>
+        <div className="section-title">
+          <BulbOutlined />
+          <Title level={5} style={{ margin: 0 }}>Quick Context</Title>
+        </div>
+        
+        <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
+          Just the essentials - you can always add more details later.
+        </Text>
+
+        <Form.Item
+          label="What are you building?"
+          name="featureName"
+          rules={[{ required: true, message: 'Please describe what you\'re building' }]}
+          tooltip="A brief name or description of what you're creating"
+        >
+          <Input placeholder="e.g., Habit tracking app, Team scheduling tool" />
+        </Form.Item>
+
+        <Form.Item
+          label="Who is it for?"
+          name="targetUsers"
+          tooltip="Who will use this? A quick description is fine."
+        >
+          <Input placeholder="e.g., Busy professionals, Small business owners" />
+        </Form.Item>
+
+        <Form.Item
+          label="Key constraint or goal (optional)"
+          name="designPrinciple"
+          tooltip="One thing that matters most - speed, simplicity, delight?"
+        >
+          <Input placeholder="e.g., Must be dead simple, Needs to feel premium" />
+        </Form.Item>
+      </div>
+    );
+  }
+
+  // Full "Project Context" mode
   return (
     <div>
       <div className="section-title">

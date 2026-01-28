@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Layout, Typography, Splitter, Collapse } from 'antd';
-import { BulbOutlined, MessageOutlined } from '@ant-design/icons';
-import PromptForm from '@/components/PromptForm';
+import { Layout, Typography, Splitter } from 'antd';
 import PromptPreview from '@/components/PromptPreview';
-import BrainDump from '@/components/BrainDump';
-import FollowupChat from '@/components/FollowupChat';
-import { PromptData, defaultPromptData } from '@/lib/types';
+import ModeSelector from '@/components/ModeSelector';
+import { IdeaWorkflow, ProductWorkflow, TeamWorkflow } from '@/components/workflows';
+import { PromptData, defaultPromptData, WorkflowMode } from '@/lib/types';
 import { ExtractedFields } from '@/lib/extract-types';
 
 const { Header, Content } = Layout;
@@ -15,36 +13,28 @@ const { Text } = Typography;
 
 export default function Home() {
   const [promptData, setPromptData] = useState<PromptData>(defaultPromptData);
-  const [isExtracting, setIsExtracting] = useState(false);
-  const [brainDumpContext, setBrainDumpContext] = useState('');
-  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<ExtractedFields>({});
-  const [formKey, setFormKey] = useState(0); // Used to force form re-render with new values
+  const [selectedMode, setSelectedMode] = useState<WorkflowMode | null>(null);
+
+  // Check if form has meaningful data (for mode switch warning)
+  const hasFormData = !!(
+    promptData.featureName || 
+    promptData.problem || 
+    promptData.targetUsers ||
+    promptData.prdContent
+  );
 
   const handleValuesChange = useCallback((_changedValues: Partial<PromptData>, allValues: PromptData) => {
     setPromptData(allValues);
   }, []);
 
-  const handleBrainDumpExtracted = useCallback((
-    extractedData: PromptData, 
-    extractedSuggestions: ExtractedFields,
-    questions: string[],
-    brainDumpText: string
-  ) => {
-    setPromptData(extractedData);
-    setSuggestions(extractedSuggestions);
-    setFollowUpQuestions(questions);
-    setBrainDumpContext(brainDumpText);
-    setFormKey(prev => prev + 1); // Force form to re-initialize with new values
-  }, []);
-
-  const handleFollowUpFieldsUpdated = useCallback((
-    updatedData: PromptData,
-    updatedSuggestions: ExtractedFields
-  ) => {
-    setPromptData(updatedData);
-    setSuggestions(prev => ({ ...prev, ...updatedSuggestions }));
-    setFormKey(prev => prev + 1);
+  const handleApplySuggestion = useCallback((field: string, value: string) => {
+    setPromptData(prev => ({ ...prev, [field]: value }));
+    setSuggestions(prev => {
+      const updated = { ...prev };
+      delete (updated as Record<string, unknown>)[field];
+      return updated;
+    });
   }, []);
 
   return (
@@ -62,9 +52,6 @@ export default function Home() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Text style={{ fontSize: 18, color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>
-            App Maker
-          </Text>
           <Text 
             style={{ 
               fontSize: 11, 
@@ -76,6 +63,9 @@ export default function Home() {
             }}
           >
             Rodrigo Labs
+          </Text>
+          <Text style={{ fontSize: 18, color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>
+            App Maker
           </Text>
         </div>
         <Text type="secondary" style={{ fontSize: 13 }}>
@@ -103,69 +93,40 @@ export default function Home() {
               height: '100%',
               overflow: 'auto',
             }}>
-              {/* Brain Dump & Follow-up Sections */}
-              <Collapse
-                defaultActiveKey={['brain-dump']}
-                style={{ marginBottom: 16 }}
-                items={[
-                  {
-                    key: 'brain-dump',
-                    label: (
-                      <span>
-                        <BulbOutlined style={{ marginRight: 8 }} />
-                        Brain Dump
-                      </span>
-                    ),
-                    children: (
-                      <BrainDump
-                        onExtracted={handleBrainDumpExtracted}
-                        currentData={promptData}
-                        isExtracting={isExtracting}
-                        onStartExtract={() => {
-                          setIsExtracting(true);
-                        }}
-                        onFinishExtract={() => setIsExtracting(false)}
-                      />
-                    ),
-                  },
-                  ...(followUpQuestions.length > 0 && brainDumpContext ? [{
-                    key: 'follow-up',
-                    label: (
-                      <span>
-                        <MessageOutlined style={{ marginRight: 8 }} />
-                        Follow-up Questions
-                      </span>
-                    ),
-                    children: (
-                      <FollowupChat
-                        initialQuestions={followUpQuestions}
-                        currentData={promptData}
-                        onFieldsUpdated={handleFollowUpFieldsUpdated}
-                        brainDumpContext={brainDumpContext}
-                      />
-                    ),
-                  }] : []),
-                ]}
+              {/* Mode Selector */}
+              <ModeSelector
+                selectedMode={selectedMode}
+                onModeSelect={setSelectedMode}
+                hasData={hasFormData}
               />
 
-              {/* Main Form */}
-              <PromptForm 
-                key={formKey}
-                onValuesChange={handleValuesChange}
-                initialValues={promptData}
-                currentData={promptData}
-                suggestions={suggestions}
-                onApplySuggestion={(field, value) => {
-                  const newData = { ...promptData, [field]: value };
-                  setPromptData(newData);
-                  setSuggestions(prev => {
-                    const updated = { ...prev };
-                    delete (updated as Record<string, unknown>)[field];
-                    return updated;
-                  });
-                  setFormKey(prev => prev + 1);
-                }}
-              />
+              {/* Mode-specific workflow components */}
+              {selectedMode === 'idea' && (
+                <IdeaWorkflow
+                  promptData={promptData}
+                  onValuesChange={handleValuesChange}
+                  suggestions={suggestions}
+                  onApplySuggestion={handleApplySuggestion}
+                />
+              )}
+
+              {selectedMode === 'product' && (
+                <ProductWorkflow
+                  promptData={promptData}
+                  onValuesChange={handleValuesChange}
+                  suggestions={suggestions}
+                  onApplySuggestion={handleApplySuggestion}
+                />
+              )}
+
+              {selectedMode === 'team' && (
+                <TeamWorkflow
+                  promptData={promptData}
+                  onValuesChange={handleValuesChange}
+                  suggestions={suggestions}
+                  onApplySuggestion={handleApplySuggestion}
+                />
+              )}
             </div>
           </Splitter.Panel>
 
