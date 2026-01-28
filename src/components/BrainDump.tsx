@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Input, Button, Typography, Space, Alert, Tag, Tooltip, Collapse, Card } from 'antd';
-import { ThunderboltOutlined, QuestionCircleOutlined, BulbOutlined } from '@ant-design/icons';
+import { ThunderboltOutlined, QuestionCircleOutlined, BulbOutlined, CheckOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { ExtractionResult, ExtractedFields, FieldExtraction, getConfidenceLevel, getConfidenceColor } from '@/lib/extract-types';
 import { PromptData } from '@/lib/types';
 import { applyExtractedFields, getSuggestedFields } from '@/lib/apply-extract';
@@ -286,205 +286,188 @@ Example: "I'm building a habit tracking app for busy professionals. They want to
   );
 }
 
-// Standalone component for rendering extraction results
+// Standalone component for rendering extraction results - notification style with hover actions
 interface ExtractionResultsDisplayProps {
   extractionResult: ExtractionResult | null;
-  onScrollToField?: (fieldName: string) => void;
+  onConfirmField?: (fieldName: string, value: string) => void;
+  onEditField?: (fieldName: string) => void;
+  onDismiss?: () => void;
 }
 
-export function ExtractionResultsDisplay({ extractionResult, onScrollToField }: ExtractionResultsDisplayProps) {
-  if (!extractionResult) return null;
+interface FieldRowProps {
+  label: string;
+  value: string;
+  fieldName: string;
+  confidence: number;
+  confirmed?: boolean;
+  onConfirm?: () => void;
+  onEdit?: () => void;
+}
 
-  const renderFieldBadge = (extraction: FieldExtraction | undefined) => {
-    if (!extraction) return null;
-    const level = getConfidenceLevel(extraction.confidence);
-    const color = getConfidenceColor(extraction.confidence);
-    
-    return (
-      <Tooltip title={extraction.evidence ? `Evidence: "${extraction.evidence}"` : 'Inferred from context'}>
-        <Tag color={color} style={{ marginLeft: 8 }}>
-          {level.toUpperCase()} ({Math.round(extraction.confidence * 100)}%)
-        </Tag>
-      </Tooltip>
-    );
-  };
-
-  const renderExtractedField = (label: string, extraction: FieldExtraction | undefined, multiline = false) => {
-    if (!extraction || !extraction.value.trim()) return null;
-    
-    const displayValue = multiline 
-      ? extraction.value 
-      : extraction.value.substring(0, 100) + (extraction.value.length > 100 ? '...' : '');
-    
-    return (
-      <div style={{ marginBottom: 8, padding: '8px 12px', background: '#1a1a1a', borderRadius: 6, border: '1px solid #303030' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-          <Text type="secondary" style={{ flexShrink: 0 }}>{label}:</Text>
-          <div style={{ flex: 1 }}>
-            <Text style={{ whiteSpace: multiline ? 'pre-wrap' : 'normal' }}>{displayValue}</Text>
-            {renderFieldBadge(extraction)}
-          </div>
-        </div>
+function FieldRow({ label, value, confidence, confirmed, onConfirm, onEdit }: FieldRowProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const level = getConfidenceLevel(confidence);
+  const color = getConfidenceColor(confidence);
+  
+  const displayValue = value.length > 80 ? value.substring(0, 80) + '...' : value;
+  
+  return (
+    <div 
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 8,
+        padding: '6px 8px',
+        borderRadius: 4,
+        background: isHovered ? '#262626' : 'transparent',
+        transition: 'background 0.15s',
+      }}
+    >
+      {confirmed && (
+        <CheckCircleOutlined style={{ color: '#52c41a', fontSize: 12, flexShrink: 0 }} />
+      )}
+      <Text type="secondary" style={{ fontSize: 12, flexShrink: 0, minWidth: 70 }}>{label}</Text>
+      <Text style={{ fontSize: 13, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {displayValue}
+      </Text>
+      <Tag color={color} style={{ fontSize: 10, padding: '0 4px', margin: 0 }}>
+        {level.toUpperCase()}
+      </Tag>
+      
+      {/* Hover actions */}
+      <div style={{ 
+        display: 'flex', 
+        gap: 4, 
+        opacity: isHovered ? 1 : 0,
+        transition: 'opacity 0.15s',
+      }}>
+        <Tooltip title="Confirm">
+          <Button 
+            type="text" 
+            size="small" 
+            icon={<CheckOutlined style={{ fontSize: 12 }} />}
+            onClick={onConfirm}
+            style={{ padding: '2px 6px', height: 'auto' }}
+          />
+        </Tooltip>
+        <Tooltip title="Edit">
+          <Button 
+            type="text" 
+            size="small" 
+            icon={<EditOutlined style={{ fontSize: 12 }} />}
+            onClick={onEdit}
+            style={{ padding: '2px 6px', height: 'auto' }}
+          />
+        </Tooltip>
       </div>
-    );
+    </div>
+  );
+}
+
+export function ExtractionResultsDisplay({ 
+  extractionResult, 
+  onConfirmField, 
+  onEditField,
+  onDismiss 
+}: ExtractionResultsDisplayProps) {
+  const [confirmedFields, setConfirmedFields] = useState<Set<string>>(new Set());
+  const [isDismissed, setIsDismissed] = useState(false);
+  
+  if (!extractionResult || isDismissed) return null;
+
+  const handleConfirm = (fieldName: string, value: string) => {
+    setConfirmedFields(prev => new Set([...prev, fieldName]));
+    onConfirmField?.(fieldName, value);
   };
 
-  // Map missing item names to form field names for click-to-scroll
-  const getMissingFieldLink = (missingItem: string): string | null => {
-    const lowerItem = missingItem.toLowerCase();
-    if (lowerItem.includes('journey')) return 'journeys';
-    if (lowerItem.includes('platform')) return 'platform';
-    if (lowerItem.includes('design') && lowerItem.includes('vibe')) return 'designVibe';
-    if (lowerItem.includes('design') && lowerItem.includes('system')) return 'designSystem';
-    if (lowerItem.includes('user') || lowerItem.includes('target')) return 'targetUsers';
-    if (lowerItem.includes('problem')) return 'problem';
-    if (lowerItem.includes('principle')) return 'designPrinciple';
-    if (lowerItem.includes('challenge')) return 'criticalChallenge';
-    if (lowerItem.includes('company') || lowerItem.includes('product')) return 'productCompany';
-    if (lowerItem.includes('summary')) return 'appSummary';
-    return null;
+  const handleEdit = (fieldName: string) => {
+    onEditField?.(fieldName);
   };
 
-  const handleMissingClick = (fieldName: string) => {
-    if (onScrollToField) {
-      onScrollToField(fieldName);
-    }
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    onDismiss?.();
   };
 
-  // Filter to only show truly critical missing items (for Idea mode, be very conservative)
-  const criticalMissing = (extractionResult.missing || []).filter(item => {
-    const lower = item.toLowerCase();
-    // Only critical: journeys if completely empty, or target users if completely unknown
-    return lower.includes('journey') || (lower.includes('target') && lower.includes('user'));
-  });
+  // Collect all fields to display
+  const fields: Array<{ label: string; fieldName: string; extraction: FieldExtraction | undefined }> = [
+    { label: 'App Name', fieldName: 'featureName', extraction: extractionResult.fields.featureName },
+    { label: 'App Type', fieldName: 'appType', extraction: extractionResult.fields.appType },
+    { label: 'Summary', fieldName: 'appSummary', extraction: extractionResult.fields.appSummary },
+    { label: 'Problem', fieldName: 'problem', extraction: extractionResult.fields.problem },
+    { label: 'Users', fieldName: 'targetUsers', extraction: extractionResult.fields.targetUsers },
+    { label: 'Principle', fieldName: 'designPrinciple', extraction: extractionResult.fields.designPrinciple },
+    { label: 'Platform', fieldName: 'platform', extraction: extractionResult.fields.platform },
+    { label: 'Vibe', fieldName: 'designVibe', extraction: extractionResult.fields.designVibe },
+  ].filter(f => f.extraction && f.extraction.value.trim());
+
+  const journeyCount = extractionResult.fields.journeys?.length || 0;
 
   return (
-    <div>
-      <Title level={5}>
-        <Space>
-          Extracted Fields
-          <Tooltip title="Fields with HIGH confidence were auto-applied. Review and edit as needed.">
-            <QuestionCircleOutlined />
-          </Tooltip>
+    <div style={{ 
+      background: '#1a1a1a', 
+      border: '1px solid #303030',
+      borderRadius: 8,
+      overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        padding: '10px 12px',
+        borderBottom: '1px solid #303030',
+        background: '#222',
+      }}>
+        <Space size={8}>
+          <CheckCircleOutlined style={{ color: '#52c41a' }} />
+          <Text style={{ fontSize: 13 }}>Extracted {fields.length} fields</Text>
+          {journeyCount > 0 && (
+            <Tag color="#722ed1" style={{ margin: 0 }}>{journeyCount} journeys</Tag>
+          )}
         </Space>
-      </Title>
+        <Button 
+          type="text" 
+          size="small"
+          onClick={handleDismiss}
+          style={{ fontSize: 12 }}
+        >
+          Looks good
+        </Button>
+      </div>
 
-      {/* App Identity Group */}
-      {(extractionResult.fields.featureName || extractionResult.fields.appType || extractionResult.fields.appSummary) && (
-        <div style={{ marginBottom: 16 }}>
-          <Text type="secondary" style={{ fontSize: 12, marginBottom: 8, display: 'block' }}>App Identity</Text>
-          {renderExtractedField('App Name', extractionResult.fields.featureName)}
-          {renderExtractedField('App Type', extractionResult.fields.appType)}
-          {renderExtractedField('Summary', extractionResult.fields.appSummary, true)}
-        </div>
-      )}
-
-      {/* Core Details Group */}
-      {(extractionResult.fields.problem || extractionResult.fields.targetUsers || extractionResult.fields.designPrinciple) && (
-        <div style={{ marginBottom: 16 }}>
-          <Text type="secondary" style={{ fontSize: 12, marginBottom: 8, display: 'block' }}>Core Details</Text>
-          {renderExtractedField('Problem', extractionResult.fields.problem, true)}
-          {renderExtractedField('Target Users', extractionResult.fields.targetUsers)}
-          {renderExtractedField('Design Principle', extractionResult.fields.designPrinciple)}
-          {renderExtractedField('Critical Challenge', extractionResult.fields.criticalChallenge)}
-        </div>
-      )}
-
-      {/* Design & Platform Group */}
-      {(extractionResult.fields.platform || extractionResult.fields.designVibe || extractionResult.fields.designSystem) && (
-        <div style={{ marginBottom: 16 }}>
-          <Text type="secondary" style={{ fontSize: 12, marginBottom: 8, display: 'block' }}>Design & Platform</Text>
-          {renderExtractedField('Platform', extractionResult.fields.platform)}
-          {renderExtractedField('Design Vibe', extractionResult.fields.designVibe, true)}
-          {renderExtractedField('Design System', extractionResult.fields.designSystem)}
-        </div>
-      )}
-
-      {/* Journeys */}
-      {extractionResult.fields.journeys && extractionResult.fields.journeys.length > 0 && (
-        <Collapse
-          items={[{
-            key: 'journeys',
-            label: (
-              <Space>
-                <span>User Journeys ({extractionResult.fields.journeys.length} found)</span>
-                <Tag color="#722ed1" style={{ marginLeft: 4 }}>Core Flows</Tag>
-              </Space>
-            ),
-            children: extractionResult.fields.journeys.map((j, i) => (
-              <div key={i} style={{ 
-                marginBottom: 12, 
-                padding: 12, 
-                background: '#141414', 
-                borderRadius: 6,
-                border: '1px solid #303030'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-                  <Text strong>Journey {i + 1}: {j.name?.value || 'Unnamed'}</Text>
-                  {renderFieldBadge(j.name)}
-                </div>
-                {j.when?.value && (
-                  <div style={{ marginBottom: 4 }}>
-                    <Text type="secondary">When: </Text>
-                    <Text>{j.when.value}</Text>
-                  </div>
-                )}
-                {j.trigger?.value && (
-                  <div style={{ marginBottom: 4 }}>
-                    <Text type="secondary">Trigger: </Text>
-                    <Text>{j.trigger.value}</Text>
-                  </div>
-                )}
-                {j.mustCommunicate?.value && (
-                  <div style={{ marginBottom: 4 }}>
-                    <Text type="secondary">Must communicate: </Text>
-                    <Text>{j.mustCommunicate.value}</Text>
-                  </div>
-                )}
-                {j.ctas?.value && (
-                  <div style={{ marginBottom: 4 }}>
-                    <Text type="secondary">Key actions: </Text>
-                    <Text>{j.ctas.value}</Text>
-                  </div>
-                )}
-              </div>
-            ))
-          }]}
-          style={{ marginTop: 12 }}
-          defaultActiveKey={['journeys']}
-        />
-      )}
-
-      {/* Only show critical missing items */}
-      {criticalMissing.length > 0 && (
-        <Alert
-          message="Needs Attention"
-          description={
-            <div>
-              {criticalMissing.map((m, i) => {
-                const fieldLink = getMissingFieldLink(m);
-                return (
-                  <div 
-                    key={i} 
-                    onClick={() => fieldLink && handleMissingClick(fieldLink)}
-                    style={{ 
-                      cursor: fieldLink ? 'pointer' : 'default',
-                      padding: '4px 0',
-                      color: fieldLink ? '#1890ff' : 'inherit',
-                      textDecoration: fieldLink ? 'underline' : 'none'
-                    }}
-                  >
-                    • {m}
-                  </div>
-                );
-              })}
-            </div>
-          }
-          type="warning"
-          showIcon
-          style={{ marginTop: 16 }}
-        />
-      )}
+      {/* Fields list - compact */}
+      <div style={{ padding: '8px 4px', maxHeight: 280, overflowY: 'auto' }}>
+        {fields.map(({ label, fieldName, extraction }) => (
+          <FieldRow
+            key={fieldName}
+            label={label}
+            value={extraction!.value}
+            fieldName={fieldName}
+            confidence={extraction!.confidence}
+            confirmed={confirmedFields.has(fieldName)}
+            onConfirm={() => handleConfirm(fieldName, extraction!.value)}
+            onEdit={() => handleEdit(fieldName)}
+          />
+        ))}
+        
+        {/* Journeys summary row */}
+        {journeyCount > 0 && (
+          <div style={{ 
+            padding: '6px 8px',
+            borderTop: '1px solid #303030',
+            marginTop: 4,
+          }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {journeyCount} user {journeyCount === 1 ? 'journey' : 'journeys'}: {' '}
+              {extractionResult.fields.journeys!.slice(0, 3).map(j => j.name?.value || 'Unnamed').join(', ')}
+              {journeyCount > 3 && '...'}
+            </Text>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

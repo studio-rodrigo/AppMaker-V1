@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { Form, Collapse, Button, Typography, Space } from 'antd';
 import { DownOutlined, SettingOutlined } from '@ant-design/icons';
 import BrainDump, { ExtractionResultsDisplay } from '../BrainDump';
-import FollowupChat from '../FollowupChat';
+import QuestionFlow from '../QuestionFlow';
 import ProjectContext from '../ProjectContext';
 import JourneyBuilder from '../JourneyBuilder';
 import DesignSystemInput from '../DesignSystemInput';
 import UIRequirements from '../UIRequirements';
-import { PromptData, defaultPromptData } from '@/lib/types';
+import { PromptData } from '@/lib/types';
 import { ExtractedFields, ExtractionResult } from '@/lib/extract-types';
 
 const { Text } = Typography;
@@ -25,7 +25,6 @@ export default function IdeaWorkflow({
   promptData,
   onValuesChange,
   suggestions = {},
-  onApplySuggestion,
 }: IdeaWorkflowProps) {
   const [form] = Form.useForm<PromptData>();
   const [hasExtracted, setHasExtracted] = useState(false);
@@ -35,6 +34,8 @@ export default function IdeaWorkflow({
   const [brainDumpContext, setBrainDumpContext] = useState('');
   const [localSuggestions, setLocalSuggestions] = useState<ExtractedFields>(suggestions);
   const [extractionResult, setExtractionResult] = useState<ExtractionResult | null>(null);
+  const [questionsComplete, setQuestionsComplete] = useState(false);
+  const [extractionDismissed, setExtractionDismissed] = useState(false);
 
   const handleBrainDumpExtracted = (
     extractedData: PromptData,
@@ -66,6 +67,8 @@ export default function IdeaWorkflow({
     setBrainDumpContext(brainDumpText);
     setExtractionResult(result);
     setHasExtracted(true);
+    setQuestionsComplete(false);
+    setExtractionDismissed(false);
   };
 
   const handleFollowUpFieldsUpdated = (
@@ -75,6 +78,24 @@ export default function IdeaWorkflow({
     form.setFieldsValue(updatedData);
     onValuesChange({}, updatedData);
     setLocalSuggestions(prev => ({ ...prev, ...updatedSuggestions }));
+  };
+
+  const handleQuestionsComplete = () => {
+    setQuestionsComplete(true);
+  };
+
+  const handleConfirmField = (fieldName: string, value: string) => {
+    // Field confirmed - could track this or trigger form update
+    console.log('Confirmed field:', fieldName, value);
+  };
+
+  const handleEditField = (fieldName: string) => {
+    // Scroll to field in form - for now just log
+    console.log('Edit field:', fieldName);
+  };
+
+  const handleDismissExtraction = () => {
+    setExtractionDismissed(true);
   };
 
   return (
@@ -96,22 +117,28 @@ export default function IdeaWorkflow({
         hideExtractionResults
       />
 
-      {/* FollowUp Chat - appears after extraction, BEFORE extracted fields */}
-      {hasExtracted && followUpQuestions.length > 0 && brainDumpContext && (
-        <div style={{ marginTop: 24 }}>
-          <FollowupChat
-            initialQuestions={followUpQuestions}
-            currentData={promptData}
-            onFieldsUpdated={handleFollowUpFieldsUpdated}
-            brainDumpContext={brainDumpContext}
+      {/* Extracted Fields - notification style, dismissible */}
+      {hasExtracted && extractionResult && !extractionDismissed && (
+        <div style={{ marginTop: 16 }}>
+          <ExtractionResultsDisplay 
+            extractionResult={extractionResult}
+            onConfirmField={handleConfirmField}
+            onEditField={handleEditField}
+            onDismiss={handleDismissExtraction}
           />
         </div>
       )}
 
-      {/* Extracted Fields - appears AFTER the chat */}
-      {hasExtracted && extractionResult && (
-        <div style={{ marginTop: 24 }}>
-          <ExtractionResultsDisplay extractionResult={extractionResult} />
+      {/* Question Flow - one at a time, optional */}
+      {hasExtracted && !questionsComplete && followUpQuestions.length > 0 && brainDumpContext && (
+        <div style={{ marginTop: 16 }}>
+          <QuestionFlow
+            questions={followUpQuestions}
+            currentData={promptData}
+            onFieldsUpdated={handleFollowUpFieldsUpdated}
+            brainDumpContext={brainDumpContext}
+            onComplete={handleQuestionsComplete}
+          />
         </div>
       )}
 

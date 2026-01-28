@@ -48,11 +48,14 @@ Return a JSON object with this exact structure:
 
 CRITICAL RULES FOR IDEA MODE:
 
-1. JOURNEYS - ALWAYS GENERATE:
-   - Even if not explicitly described, infer 2-4 core user journeys from the app type/problem
-   - Common patterns: Onboarding, Core Action (what they mainly do), Progress/Review, Settings/Profile
-   - Mark inferred journeys with lower confidence (0.6-0.7) but INCLUDE THEM
-   - Example: A "habit tracker" implies: First launch/setup, Logging a habit, Viewing progress, Managing habits
+1. JOURNEYS - MANDATORY MINIMUM OF 2:
+   - You MUST generate AT LEAST 2 user journeys, even for the simplest app
+   - If the brain dump describes flows, extract those at HIGH confidence (0.8+)
+   - If not explicitly described, INFER journeys from app type - use MEDIUM confidence (0.6-0.7)
+   - Every app has at minimum: (1) First-time/Onboarding and (2) Core Action
+   - Common patterns to infer: Onboarding, Core Action, Progress/Review, Settings, Search/Browse
+   - Example: A "journaling app" MUST include: First Launch, Writing an Entry (and optionally: Viewing Past Entries, Managing Categories)
+   - NEVER return an empty journeys array - always provide at least 2
 
 2. DESIGN VIBE - ALWAYS PROVIDE:
    - Infer from: target users, problem space, app type, any adjectives used
