@@ -18,7 +18,7 @@ import TeamContext from '../TeamContext';
 import JourneyBuilder from '../JourneyBuilder';
 import DesignSystemInput from '../DesignSystemInput';
 import UIRequirements from '../UIRequirements';
-import FollowupChat from '../FollowupChat';
+import QuestionFlow from '../QuestionFlow';
 import { PromptData, defaultPromptData } from '@/lib/types';
 import { ExtractedFields } from '@/lib/extract-types';
 
@@ -43,6 +43,7 @@ export default function TeamWorkflow({
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
   const [brainDumpContext, setBrainDumpContext] = useState('');
   const [localSuggestions, setLocalSuggestions] = useState<ExtractedFields>(suggestions);
+  const [questionsComplete, setQuestionsComplete] = useState(false);
 
   const handleReset = () => {
     form.resetFields();
@@ -243,13 +244,14 @@ export default function TeamWorkflow({
             onFinishExtract={() => setIsExtracting(false)}
           />
           
-          {followUpQuestions.length > 0 && brainDumpContext && (
+          {!questionsComplete && followUpQuestions.length > 0 && brainDumpContext && (
             <div style={{ marginTop: 16 }}>
-              <FollowupChat
-                initialQuestions={followUpQuestions}
+              <QuestionFlow
+                questions={followUpQuestions}
                 currentData={promptData}
                 onFieldsUpdated={handleFollowUpFieldsUpdated}
                 brainDumpContext={brainDumpContext}
+                onComplete={() => setQuestionsComplete(true)}
               />
             </div>
           )}
