@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Input, Button, Typography, Space, List, Tag } from 'antd';
-import { SendOutlined, RobotOutlined, UserOutlined } from '@ant-design/icons';
+import { Input, Button, Typography, Space, List, Tag, Card } from 'antd';
+import { SendOutlined, RobotOutlined, UserOutlined, MessageOutlined } from '@ant-design/icons';
 import { ChatMessage, ExtractionResult, ExtractedFields } from '@/lib/extract-types';
 import { PromptData } from '@/lib/types';
 import { applyExtractedFields, getSuggestedFields } from '@/lib/apply-extract';
 
 const { TextArea } = Input;
-const { Text, Paragraph } = Typography;
+const { Text, Paragraph, Title } = Typography;
 
 interface FollowupChatProps {
   initialQuestions: string[];
@@ -112,34 +112,57 @@ export default function FollowupChat({
   }
 
   return (
-    <div>
+    <Card
+      style={{ 
+        background: '#1a1a1a', 
+        border: '1px solid #303030',
+        borderRadius: 8,
+      }}
+      styles={{
+        body: { padding: 16 }
+      }}
+    >
+      {/* Header */}
       <div style={{ 
-        maxHeight: 300, 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 8, 
+        marginBottom: 16,
+        paddingBottom: 12,
+        borderBottom: '1px solid #303030'
+      }}>
+        <MessageOutlined style={{ fontSize: 18, color: '#722ed1' }} />
+        <Title level={5} style={{ margin: 0 }}>Fill in the Gaps</Title>
+      </div>
+
+      {/* Chat Messages */}
+      <div style={{ 
+        maxHeight: 240, 
         overflowY: 'auto', 
         marginBottom: 16,
-        padding: 8,
+        padding: 12,
         background: '#141414',
         borderRadius: 6,
-        border: '1px solid #303030'
       }}>
         <List
           dataSource={messages}
+          split={false}
           renderItem={(msg) => (
             <List.Item style={{ 
               border: 'none', 
-              padding: '8px 0',
+              padding: '6px 0',
               justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'
             }}>
               <div style={{
-                maxWidth: '80%',
-                padding: '8px 12px',
-                borderRadius: 8,
-                background: msg.role === 'user' ? '#2444EC' : '#1f1f1f',
+                maxWidth: '85%',
+                padding: '10px 14px',
+                borderRadius: msg.role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
+                background: msg.role === 'user' ? '#2444EC' : '#262626',
               }}>
-                <Space align="start">
-                  {msg.role === 'assistant' && <RobotOutlined style={{ marginTop: 4 }} />}
-                  <Text>{msg.content}</Text>
-                  {msg.role === 'user' && <UserOutlined style={{ marginTop: 4 }} />}
+                <Space align="start" size={8}>
+                  {msg.role === 'assistant' && <RobotOutlined style={{ marginTop: 2, color: '#722ed1' }} />}
+                  <Text style={{ lineHeight: 1.5 }}>{msg.content}</Text>
+                  {msg.role === 'user' && <UserOutlined style={{ marginTop: 2 }} />}
                 </Space>
               </div>
             </List.Item>
@@ -148,58 +171,76 @@ export default function FollowupChat({
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Suggested Questions */}
       {suggestedQuestions.length > 0 && (
-        <div style={{ marginBottom: 12 }}>
-          <Text type="secondary" style={{ fontSize: 12, marginBottom: 8, display: 'block' }}>
+        <div style={{ marginBottom: 16 }}>
+          <Text type="secondary" style={{ fontSize: 12, marginBottom: 10, display: 'block' }}>
             Click a question to answer it:
           </Text>
-          <Space wrap>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {suggestedQuestions.map((q, i) => (
               <Tag
                 key={i}
                 onClick={() => handleQuestionClick(q)}
                 style={{ 
                   cursor: 'pointer', 
-                  padding: '4px 8px',
-                  background: '#1f1f1f',
-                  border: '1px solid #424242'
+                  padding: '8px 12px',
+                  background: '#262626',
+                  border: '1px solid #424242',
+                  borderRadius: 6,
+                  fontSize: 13,
+                  whiteSpace: 'normal',
+                  lineHeight: 1.4,
+                  margin: 0,
                 }}
               >
                 {q}
               </Tag>
             ))}
-          </Space>
+          </div>
         </div>
       )}
 
-      <Space.Compact style={{ width: '100%' }}>
-        <TextArea
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Type your answer or add more context..."
-          autoSize={{ minRows: 1, maxRows: 4 }}
-          onPressEnter={(e) => {
-            if (!e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-          style={{ flex: 1 }}
-        />
-        <Button
-          type="primary"
-          icon={<SendOutlined />}
-          onClick={() => handleSend()}
-          loading={isLoading}
-          disabled={!inputValue.trim()}
-        >
-          Send
-        </Button>
-      </Space.Compact>
-
-      <Paragraph type="secondary" style={{ fontSize: 11, marginTop: 8, marginBottom: 0 }}>
-        Press Enter to send, Shift+Enter for new line
-      </Paragraph>
-    </div>
+      {/* Input Area */}
+      <div style={{ 
+        background: '#141414', 
+        borderRadius: 6, 
+        padding: 8,
+        border: '1px solid #303030'
+      }}>
+        <Space.Compact style={{ width: '100%' }}>
+          <TextArea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Type your answer or add more context..."
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            onPressEnter={(e) => {
+              if (!e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            style={{ 
+              flex: 1, 
+              background: 'transparent', 
+              border: 'none',
+              resize: 'none',
+            }}
+          />
+          <Button
+            type="primary"
+            icon={<SendOutlined />}
+            onClick={() => handleSend()}
+            loading={isLoading}
+            disabled={!inputValue.trim()}
+          >
+            Send
+          </Button>
+        </Space.Compact>
+        <Text type="secondary" style={{ fontSize: 11, marginTop: 6, display: 'block' }}>
+          Press Enter to send, Shift+Enter for new line
+        </Text>
+      </div>
+    </Card>
   );
 }

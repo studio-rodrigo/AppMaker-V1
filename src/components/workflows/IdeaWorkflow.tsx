@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { Form, Collapse, Button, Typography, Space } from 'antd';
 import { DownOutlined, SettingOutlined } from '@ant-design/icons';
-import BrainDump from '../BrainDump';
+import BrainDump, { ExtractionResultsDisplay } from '../BrainDump';
 import FollowupChat from '../FollowupChat';
 import ProjectContext from '../ProjectContext';
 import JourneyBuilder from '../JourneyBuilder';
 import DesignSystemInput from '../DesignSystemInput';
 import UIRequirements from '../UIRequirements';
 import { PromptData, defaultPromptData } from '@/lib/types';
-import { ExtractedFields } from '@/lib/extract-types';
+import { ExtractedFields, ExtractionResult } from '@/lib/extract-types';
 
 const { Text } = Typography;
 
@@ -34,12 +34,14 @@ export default function IdeaWorkflow({
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
   const [brainDumpContext, setBrainDumpContext] = useState('');
   const [localSuggestions, setLocalSuggestions] = useState<ExtractedFields>(suggestions);
+  const [extractionResult, setExtractionResult] = useState<ExtractionResult | null>(null);
 
   const handleBrainDumpExtracted = (
     extractedData: PromptData,
     extractedSuggestions: ExtractedFields,
     questions: string[],
-    brainDumpText: string
+    brainDumpText: string,
+    result: ExtractionResult
   ) => {
     // Update form with extracted data
     form.setFieldsValue(extractedData);
@@ -48,6 +50,7 @@ export default function IdeaWorkflow({
     setLocalSuggestions(extractedSuggestions);
     setFollowUpQuestions(questions);
     setBrainDumpContext(brainDumpText);
+    setExtractionResult(result);
     setHasExtracted(true);
   };
 
@@ -76,9 +79,10 @@ export default function IdeaWorkflow({
         isExtracting={isExtracting}
         onStartExtract={() => setIsExtracting(true)}
         onFinishExtract={() => setIsExtracting(false)}
+        hideExtractionResults
       />
 
-      {/* FollowUp Chat - appears after extraction */}
+      {/* FollowUp Chat - appears after extraction, BEFORE extracted fields */}
       {hasExtracted && followUpQuestions.length > 0 && brainDumpContext && (
         <div style={{ marginTop: 24 }}>
           <FollowupChat
@@ -87,6 +91,13 @@ export default function IdeaWorkflow({
             onFieldsUpdated={handleFollowUpFieldsUpdated}
             brainDumpContext={brainDumpContext}
           />
+        </div>
+      )}
+
+      {/* Extracted Fields - appears AFTER the chat */}
+      {hasExtracted && extractionResult && (
+        <div style={{ marginTop: 24 }}>
+          <ExtractionResultsDisplay extractionResult={extractionResult} />
         </div>
       )}
 
