@@ -3,61 +3,85 @@ import { NextRequest, NextResponse } from 'next/server';
 // Extraction endpoint - extracts structured fields from brain dump text
 // Returns JSON with fields, confidence scores, evidence, and follow-up questions
 
-const EXTRACTION_SYSTEM_PROMPT = `You are a product requirements extraction assistant. Your job is to extract structured information from a user's brain dump text about their project.
+const EXTRACTION_SYSTEM_PROMPT = `You are a product requirements extraction assistant for the "Explore an Idea" workflow. Your job is to help vibe coders (people building apps with AI assistance) turn rough ideas into structured design briefs.
 
-CRITICAL RULES:
-1. Only extract information that is EXPLICITLY stated or STRONGLY implied in the brain dump
-2. Do NOT invent, assume, or hallucinate any information
-3. If information is not present, leave that field empty or null
-4. Provide confidence scores based on how clearly the information was stated
-5. Quote evidence directly from the brain dump text
+EXTRACTION PHILOSOPHY:
+1. Be GENERATIVE for Idea mode - infer reasonable defaults from context
+2. Help the user move forward, not block them with missing fields
+3. Always provide something useful for journeys, design vibe, and app summary
+4. Only flag truly CRITICAL missing info that would block design work
 
 Return a JSON object with this exact structure:
 {
   "fields": {
-    "featureName": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
+    "featureName": { "value": "App Name", "confidence": 0.0-1.0, "evidence": "quoted text" },
+    "appType": { "value": "App category/type (e.g., 'habit tracking app', 'team scheduling tool')", "confidence": 0.0-1.0, "evidence": "quoted text" },
+    "appSummary": { "value": "2-3 sentence digestible summary for vibe coders - what it does, who it's for, what makes it special", "confidence": 0.0-1.0, "evidence": "inferred from brain dump" },
     "productCompany": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
     "problem": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
     "targetUsers": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
     "designPrinciple": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
     "criticalChallenge": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
-    "platform": { "value": "web|mobile|desktop|responsive or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
+    "platform": { "value": "web|mobile|desktop|responsive", "confidence": 0.0-1.0, "evidence": "quoted text or inferred" },
+    "designVibe": { "value": "Aesthetic/feel description - ALWAYS provide something based on problem, users, or app type", "confidence": 0.0-1.0, "evidence": "quoted or inferred" },
     "designSystem": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
     "layoutConstraints": { "value": "string or empty", "confidence": 0.0-1.0, "evidence": "quoted text or empty" },
     "journeys": [
       {
-        "name": { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" },
-        "when": { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" },
-        "trigger": { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" },
-        "mustCommunicate": { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" },
-        "ctas": { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" },
-        "tone": { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" },
-        "supportingElements": { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" }
+        "name": { "value": "Journey name - ALWAYS generate at least 2-3 core journeys", "confidence": 0.0-1.0, "evidence": "text" },
+        "when": { "value": "When this happens", "confidence": 0.0-1.0, "evidence": "text" },
+        "trigger": { "value": "What triggers this", "confidence": 0.0-1.0, "evidence": "text" },
+        "mustCommunicate": { "value": "Key info to show", "confidence": 0.0-1.0, "evidence": "text" },
+        "ctas": { "value": "Primary actions", "confidence": 0.0-1.0, "evidence": "text" },
+        "tone": { "value": "Emotional tone", "confidence": 0.0-1.0, "evidence": "text" },
+        "supportingElements": { "value": "Supporting UI elements", "confidence": 0.0-1.0, "evidence": "text" }
       }
     ],
     "supportingScreens": [
       { "value": "string", "confidence": 0.0-1.0, "evidence": "quoted text" }
     ]
   },
-  "missing": ["list of important fields that could not be extracted"],
-  "followUpQuestions": ["1-3 specific questions to fill the most critical gaps"],
+  "missing": ["ONLY truly critical missing items - things that would block design work"],
+  "followUpQuestions": ["1-3 specific questions to improve the brief"],
   "assistantMessage": "A brief, helpful message summarizing what was extracted"
 }
 
-CONFIDENCE SCORING:
-- 1.0: Explicitly and clearly stated
-- 0.8-0.9: Clearly implied with strong context
-- 0.6-0.7: Reasonably implied but needs confirmation
-- 0.4-0.5: Weakly implied, user should verify
-- Below 0.4: Do not extract, too uncertain
+CRITICAL RULES FOR IDEA MODE:
 
-IMPORTANT:
-- Keep extracted values concise and structured
-- For "problem", synthesize into 2-3 clear sentences
-- For "targetUsers", include role, context, frequency, device if mentioned
-- For "designPrinciple", identify the core UX north star if mentioned
-- For journeys, only create entries for distinct user flows that were described
-- Return ONLY valid JSON, no markdown, no explanation outside the JSON`;
+1. JOURNEYS - ALWAYS GENERATE:
+   - Even if not explicitly described, infer 2-4 core user journeys from the app type/problem
+   - Common patterns: Onboarding, Core Action (what they mainly do), Progress/Review, Settings/Profile
+   - Mark inferred journeys with lower confidence (0.6-0.7) but INCLUDE THEM
+   - Example: A "habit tracker" implies: First launch/setup, Logging a habit, Viewing progress, Managing habits
+
+2. DESIGN VIBE - ALWAYS PROVIDE:
+   - Infer from: target users, problem space, app type, any adjectives used
+   - If a journaling app for busy people mentions "simple" → "Clean, minimal, distraction-free. Quick-entry focused."
+   - If a team tool mentions "professional" → "Modern, polished, enterprise-friendly with clear hierarchy"
+   - Default to something sensible based on the app category
+
+3. APP SUMMARY - ALWAYS PROVIDE:
+   - Create a 2-3 sentence summary that vibe coders can immediately understand
+   - Format: What it is + Who it's for + What makes it work
+   - Example: "A minimalist journaling app for busy professionals. Focuses on quick daily entries with smart prompts. Designed to make reflection feel effortless, not like homework."
+
+4. MISSING ITEMS - BE CONSERVATIVE:
+   - Only list items that truly block design work
+   - If you can reasonably infer something, DON'T list it as missing
+   - Critical = Can't design screens without it
+   - NOT critical = Nice to have but can work around
+
+5. PLATFORM - ALWAYS INFER:
+   - If not specified, infer from context or default to "responsive"
+
+CONFIDENCE SCORING:
+- 1.0: Explicitly stated
+- 0.8-0.9: Clearly implied
+- 0.6-0.7: Reasonably inferred (use for generated journeys/vibe)
+- 0.5: Educated guess
+- Below 0.5: Don't include
+
+Return ONLY valid JSON, no markdown, no explanation outside the JSON`;
 
 export async function POST(request: NextRequest) {
   try {

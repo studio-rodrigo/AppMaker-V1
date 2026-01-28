@@ -1,7 +1,7 @@
 'use client';
 
-import { Form, Input, Typography } from 'antd';
-import { ProjectOutlined, BulbOutlined } from '@ant-design/icons';
+import { Form, Input, Typography, Space, Divider } from 'antd';
+import { ProjectOutlined, BulbOutlined, AppstoreOutlined, FileTextOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
@@ -21,18 +21,55 @@ export default function ProjectContext({ simplified = false }: ProjectContextPro
         </div>
         
         <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
-          Just the essentials - you can always add more details later.
+          Just the essentials - these help AI understand what you're building.
         </Text>
 
-        <Form.Item
-          label="What are you building?"
-          name="featureName"
-          rules={[{ required: true, message: 'Please describe what you\'re building' }]}
-          tooltip="A brief name or description of what you're creating"
-        >
-          <Input placeholder="e.g., Habit tracking app, Team scheduling tool" />
-        </Form.Item>
+        {/* App Identity */}
+        <div style={{ 
+          background: '#1a1a1a', 
+          padding: 16, 
+          borderRadius: 8, 
+          marginBottom: 16,
+          border: '1px solid #303030'
+        }}>
+          <Space style={{ marginBottom: 12 }}>
+            <AppstoreOutlined style={{ color: '#722ed1' }} />
+            <Text strong>App Identity</Text>
+          </Space>
+          
+          <Form.Item
+            label="App Name"
+            name="featureName"
+            rules={[{ required: true, message: 'Please enter an app name' }]}
+            tooltip="What do you call this app?"
+            style={{ marginBottom: 12 }}
+          >
+            <Input placeholder="e.g., DailyJournal, TeamSync, FocusFlow" />
+          </Form.Item>
 
+          <Form.Item
+            label="App Type"
+            name="appType"
+            tooltip="What category or type of app is this?"
+            style={{ marginBottom: 12 }}
+          >
+            <Input placeholder="e.g., Journaling app, Team collaboration tool, Habit tracker" />
+          </Form.Item>
+
+          <Form.Item
+            label="Quick Summary"
+            name="appSummary"
+            tooltip="A digestible 2-3 sentence description - what it does, who it's for, what makes it special"
+            style={{ marginBottom: 0 }}
+          >
+            <TextArea 
+              rows={2}
+              placeholder="e.g., A minimalist journaling app for busy professionals. Quick daily entries with smart prompts. Makes reflection feel effortless, not like homework."
+            />
+          </Form.Item>
+        </div>
+
+        {/* Core Details */}
         <Form.Item
           label="Who is it for?"
           name="targetUsers"

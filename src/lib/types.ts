@@ -65,11 +65,14 @@ export interface PromptData {
 
   // Project Context (maps to opening + Problem/Users/Principle/Challenge)
   featureName: string;
+  appType: string;           // App category/type
+  appSummary: string;        // Digestible summary for vibe coders
   productCompany: string;
   problem: string;           // 2-3 sentences
   targetUsers: string;       // Role + behavioral context
   designPrinciple: string;   // ONE North Star principle
   criticalChallenge: string; // Key tension or edge case
+  designVibe: string;        // Aesthetic/feel description
   
   // User Journeys (maps to CORE USER JOURNEYS section)
   journeys: Journey[];
@@ -96,11 +99,14 @@ export const defaultPromptData: PromptData = {
   prdContent: '',
   prdSummary: '',
   featureName: '',
+  appType: '',
+  appSummary: '',
   productCompany: '',
   problem: '',
   targetUsers: '',
   designPrinciple: '',
   criticalChallenge: '',
+  designVibe: '',
   journeys: [
     {
       name: '',

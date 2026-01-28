@@ -24,12 +24,15 @@ export function applyExtractedFields(
 
   // Apply simple fields
   applyField('featureName', extracted.featureName);
+  applyField('appType', extracted.appType);
+  applyField('appSummary', extracted.appSummary);
   applyField('productCompany', extracted.productCompany);
   applyField('problem', extracted.problem);
   applyField('targetUsers', extracted.targetUsers);
   applyField('designPrinciple', extracted.designPrinciple);
   applyField('criticalChallenge', extracted.criticalChallenge);
   applyField('platform', extracted.platform);
+  applyField('designVibe', extracted.designVibe);
   applyField('designSystem', extracted.designSystem);
   applyField('layoutConstraints', extracted.layoutConstraints);
 
@@ -80,12 +83,15 @@ export function getSuggestedFields(
   };
 
   checkField('featureName', extracted.featureName);
+  checkField('appType', extracted.appType);
+  checkField('appSummary', extracted.appSummary);
   checkField('productCompany', extracted.productCompany);
   checkField('problem', extracted.problem);
   checkField('targetUsers', extracted.targetUsers);
   checkField('designPrinciple', extracted.designPrinciple);
   checkField('criticalChallenge', extracted.criticalChallenge);
   checkField('platform', extracted.platform);
+  checkField('designVibe', extracted.designVibe);
   checkField('designSystem', extracted.designSystem);
   checkField('layoutConstraints', extracted.layoutConstraints);
 

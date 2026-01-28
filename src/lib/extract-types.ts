@@ -18,6 +18,8 @@ export interface JourneyExtraction {
 
 export interface ExtractedFields {
   featureName?: FieldExtraction;
+  appType?: FieldExtraction;           // App category/type (e.g., "habit tracking app")
+  appSummary?: FieldExtraction;        // Digestible summary for vibe coders
   productCompany?: FieldExtraction;
   problem?: FieldExtraction;
   targetUsers?: FieldExtraction;
@@ -26,9 +28,26 @@ export interface ExtractedFields {
   journeys?: JourneyExtraction[];
   supportingScreens?: FieldExtraction[];
   platform?: FieldExtraction;
+  designVibe?: FieldExtraction;        // Aesthetic/feel description
   designSystem?: FieldExtraction;
   layoutConstraints?: FieldExtraction;
 }
+
+// Field to form field name mapping for click-to-scroll
+export const FIELD_TO_FORM_NAME: Record<string, string> = {
+  'featureName': 'featureName',
+  'appType': 'featureName',
+  'appSummary': 'appSummary',
+  'productCompany': 'productCompany',
+  'problem': 'problem',
+  'targetUsers': 'targetUsers',
+  'designPrinciple': 'designPrinciple',
+  'criticalChallenge': 'criticalChallenge',
+  'platform': 'platform',
+  'designVibe': 'designVibe',
+  'designSystem': 'designSystem',
+  'journeys': 'journeys',
+};
 
 export interface ExtractionResult {
   fields: ExtractedFields;

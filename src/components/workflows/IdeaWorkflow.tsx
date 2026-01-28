@@ -43,9 +43,23 @@ export default function IdeaWorkflow({
     brainDumpText: string,
     result: ExtractionResult
   ) => {
+    // If we have a designVibe, also update the designSystemConfig for the vibe input
+    let finalData = { ...extractedData };
+    if (extractedData.designVibe && extractedData.designVibe.trim()) {
+      finalData = {
+        ...finalData,
+        designSystemConfig: {
+          ...finalData.designSystemConfig,
+          type: 'vibe' as const,
+          toneDescription: extractedData.designVibe,
+        },
+        designSystem: extractedData.designVibe,
+      };
+    }
+    
     // Update form with extracted data
-    form.setFieldsValue(extractedData);
-    onValuesChange({}, extractedData);
+    form.setFieldsValue(finalData);
+    onValuesChange({}, finalData);
     
     setLocalSuggestions(extractedSuggestions);
     setFollowUpQuestions(questions);
@@ -105,12 +119,17 @@ export default function IdeaWorkflow({
       {hasExtracted && (
         <div style={{ marginTop: 24 }}>
           <Collapse
-            defaultActiveKey={['quick-context', 'design-vibe']}
+            defaultActiveKey={['quick-context', 'design-vibe', 'journeys']}
             items={[
               {
                 key: 'quick-context',
                 label: 'Quick Context',
                 children: <ProjectContext simplified />,
+              },
+              {
+                key: 'journeys',
+                label: `User Journeys${promptData.journeys && promptData.journeys.length > 0 && promptData.journeys[0].name ? ` (${promptData.journeys.length} flows)` : ''}`,
+                children: <JourneyBuilder simplified />,
               },
               {
                 key: 'design-vibe',
@@ -121,11 +140,12 @@ export default function IdeaWorkflow({
                     value={promptData.designSystemConfig}
                     onChange={(config) => {
                       const designSystem = config.toneDescription || config.brandFeel || '';
-                      form.setFieldsValue({ designSystemConfig: config, designSystem });
-                      onValuesChange({ designSystemConfig: config, designSystem }, {
+                      form.setFieldsValue({ designSystemConfig: config, designSystem, designVibe: config.toneDescription || '' });
+                      onValuesChange({ designSystemConfig: config, designSystem, designVibe: config.toneDescription || '' }, {
                         ...promptData,
                         designSystemConfig: config,
                         designSystem,
+                        designVibe: config.toneDescription || '',
                       });
                     }}
                   />
@@ -167,11 +187,6 @@ export default function IdeaWorkflow({
                     key: 'full-context',
                     label: 'Full Project Context',
                     children: <ProjectContext />,
-                  },
-                  {
-                    key: 'journeys',
-                    label: 'User Journeys (Optional)',
-                    children: <JourneyBuilder simplified />,
                   },
                   {
                     key: 'ui-requirements',
