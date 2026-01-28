@@ -4,8 +4,13 @@ import type { PlatformType } from './platform-types';
 export const PLATFORM_LIMITS: Record<PlatformType, {
   name: string;
   maxChars: number;
-  splitStrategy: 'sections' | 'features' | 'phases';
+  splitStrategy: 'sections' | 'features' | 'phases' | 'components';
 }> = {
+  'v0': {
+    name: 'V0',
+    maxChars: 10000,
+    splitStrategy: 'components',
+  },
   'figma-make': {
     name: 'Figma Make',
     maxChars: 8000,
@@ -18,6 +23,11 @@ export const PLATFORM_LIMITS: Record<PlatformType, {
   },
   'cursor': {
     name: 'Cursor',
+    maxChars: 25000,
+    splitStrategy: 'phases',
+  },
+  'windsurf': {
+    name: 'Windsurf',
     maxChars: 25000,
     splitStrategy: 'phases',
   },

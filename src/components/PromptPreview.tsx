@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import { Card, Button, Typography, Space, Progress, Modal, message, Dropdown, Alert, Tabs, Tag } from 'antd';
-import { CopyOutlined, CheckOutlined, RocketOutlined, ExportOutlined, DownOutlined, ScissorOutlined, DownloadOutlined, WarningOutlined } from '@ant-design/icons';
-import { PromptData } from '@/lib/types';
+import { CopyOutlined, CheckOutlined, RocketOutlined, DownOutlined, ScissorOutlined, DownloadOutlined, WarningOutlined } from '@ant-design/icons';
+import { PromptData, WorkflowMode } from '@/lib/types';
 import { generatePrompt, getCompletenessScore } from '@/lib/prompt-generator';
-import { generateCursorPrompt, getSafeFilename } from '@/lib/cursor-export';
+import { getSafeFilename } from '@/lib/cursor-export';
 import type { PlatformType } from '@/lib/platform-types';
 import { PLATFORM_LIMITS, isOverLimit, getUsagePercent, formatCharCount } from '@/lib/prompt-limits';
 import { splitPrompt, PromptPart } from '@/lib/prompt-splitter';
@@ -14,37 +14,49 @@ const { Title, Text, Paragraph } = Typography;
 
 interface PromptPreviewProps {
   data: PromptData;
+  mode?: WorkflowMode | null;
 }
 
-export default function PromptPreview({ data }: PromptPreviewProps) {
+export default function PromptPreview({ data, mode }: PromptPreviewProps) {
   const [copied, setCopied] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [enhancedPrompt, setEnhancedPrompt] = useState<string | null>(null);
   const [showEnhancedModal, setShowEnhancedModal] = useState(false);
-  const [showEnhancePlatformModal, setShowEnhancePlatformModal] = useState(false);
-  const [enhancedPlatform, setEnhancedPlatform] = useState<PlatformType>('figma-make');
+  const [selectedPlatform, setSelectedPlatform] = useState<PlatformType>('cursor');
+  const [enhancedPlatform, setEnhancedPlatform] = useState<PlatformType>('cursor');
   const [splitParts, setSplitParts] = useState<PromptPart[]>([]);
   const [showSplitModal, setShowSplitModal] = useState(false);
   
-  const prompt = generatePrompt(data);
-  const completeness = getCompletenessScore(data);
+  // Generate prompt based on mode (defaults to 'product' if no mode selected)
+  const prompt = generatePrompt(data, mode || 'product');
+  const completeness = getCompletenessScore(data, mode || 'product');
 
   const platformOptions = useMemo(() => {
     return [
       {
+        key: 'cursor' as const,
+        name: 'Cursor',
+        description: 'Transform into implementation instructions',
+      },
+      {
+        key: 'windsurf' as const,
+        name: 'Windsurf',
+        description: 'Optimize for Cascade AI coding workflow',
+      },
+      {
+        key: 'v0' as const,
+        name: 'V0',
+        description: 'Generate React/shadcn UI components',
+      },
+      {
         key: 'figma-make' as const,
         name: 'Figma Make',
-        description: 'Enhance for Figma Make (keeps MDC structure)',
+        description: 'Enhance for AI design generation',
       },
       {
         key: 'lovable' as const,
         name: 'Lovable',
         description: 'Transform into a full-stack build spec',
-      },
-      {
-        key: 'cursor' as const,
-        name: 'Cursor',
-        description: 'Transform into implementation instructions',
       },
     ];
   }, []);
@@ -101,14 +113,31 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
     }
   };
 
-  const handleEnhanceClick = () => {
-    setShowEnhancePlatformModal(true);
+  const handleEnhanceClick = async () => {
+    await requestEnhance(selectedPlatform);
   };
 
-  const handleEnhancePlatformSelect = async (platform: PlatformType) => {
-    setShowEnhancePlatformModal(false);
-    await requestEnhance(platform);
+  const handlePlatformSelect = (platform: PlatformType) => {
+    setSelectedPlatform(platform);
   };
+
+  const platformMenuItems = useMemo(() => {
+    return platformOptions.map((p) => ({
+      key: p.key,
+      label: (
+        <div style={{ padding: '4px 0' }}>
+          <div style={{ fontWeight: selectedPlatform === p.key ? 600 : 400 }}>
+            {p.name}
+            {selectedPlatform === p.key && ' ✓'}
+          </div>
+          <div style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.45)' }}>
+            {p.description}
+          </div>
+        </div>
+      ),
+      onClick: () => handlePlatformSelect(p.key),
+    }));
+  }, [platformOptions, selectedPlatform]);
 
   const handleUseEnhanced = async () => {
     if (enhancedPrompt) {
@@ -117,65 +146,6 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
     }
   };
 
-  const handleExportCursor = async () => {
-    const cursorPrompt = generateCursorPrompt(data);
-    try {
-      await navigator.clipboard.writeText(cursorPrompt);
-      message.success('Cursor prompt copied! Paste it into Cursor to create a plan.');
-    } catch {
-      message.error('Failed to copy');
-    }
-  };
-
-  const handleDownloadCursor = () => {
-    const cursorPrompt = generateCursorPrompt(data);
-    const filename = `${getSafeFilename(data)}-cursor-prompt.md`;
-    const blob = new Blob([cursorPrompt], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    message.success(`Downloaded ${filename}`);
-  };
-
-  const handleDownloadFigma = () => {
-    const filename = `${getSafeFilename(data)}-figma-prompt.md`;
-    const blob = new Blob([prompt], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    message.success(`Downloaded ${filename}`);
-  };
-
-  const exportMenuItems = [
-    {
-      key: 'cursor-copy',
-      label: 'Copy for Cursor (Plan Mode)',
-      onClick: handleExportCursor,
-    },
-    {
-      key: 'cursor-download',
-      label: 'Download Cursor Prompt (.md)',
-      onClick: handleDownloadCursor,
-    },
-    {
-      type: 'divider' as const,
-    },
-    {
-      key: 'figma-download',
-      label: 'Download Figma Make Prompt (.md)',
-      onClick: handleDownloadFigma,
-    },
-  ];
 
   const getCompletenessStatus = () => {
     if (completeness >= 80) return 'success';
@@ -233,20 +203,16 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
       }
       extra={
         <Space>
-          <Dropdown menu={{ items: exportMenuItems }} trigger={['click']}>
-            <Button icon={<ExportOutlined />}>
-              Export <DownOutlined />
-            </Button>
-          </Dropdown>
-          <Button
-            icon={<RocketOutlined />}
+          <Dropdown.Button
+            type="primary"
+            icon={<DownOutlined />}
+            menu={{ items: platformMenuItems }}
             onClick={handleEnhanceClick}
             loading={isEnhancing}
           >
-            Enhance
-          </Button>
+            <RocketOutlined /> Enhance for {platformOptions.find(p => p.key === selectedPlatform)?.name}
+          </Dropdown.Button>
           <Button
-            type="primary"
             icon={copied ? <CheckOutlined /> : <CopyOutlined />}
             onClick={() => handleCopy()}
             className={copied ? 'copy-success' : ''}
@@ -293,8 +259,8 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
         type="secondary" 
         style={{ marginTop: 16, fontSize: 12 }}
       >
-        <strong>Copy</strong> → Paste into Figma Make to generate designs.<br />
-        <strong>Export → Copy for Cursor</strong> → Paste into Cursor to create an implementation plan.
+        <strong>Enhance</strong> → AI-optimize your prompt for the selected platform.<br />
+        <strong>Copy</strong> → Copy the raw prompt to clipboard.
       </Paragraph>
 
       <Modal
@@ -481,29 +447,6 @@ export default function PromptPreview({ data }: PromptPreviewProps) {
         </div>
       </Modal>
 
-      <Modal
-        title="Enhance for..."
-        open={showEnhancePlatformModal}
-        onCancel={() => setShowEnhancePlatformModal(false)}
-        footer={null}
-        width={560}
-      >
-        <Space direction="vertical" style={{ width: '100%' }} size={12}>
-          {platformOptions.map((p) => (
-            <Card
-              key={p.key}
-              hoverable
-              onClick={() => handleEnhancePlatformSelect(p.key)}
-              styles={{ body: { padding: 16 } }}
-            >
-              <Space direction="vertical" size={4} style={{ width: '100%' }}>
-                <Text strong>{p.name}</Text>
-                <Text type="secondary">{p.description}</Text>
-              </Space>
-            </Card>
-          ))}
-        </Space>
-      </Modal>
     </Card>
   );
 }

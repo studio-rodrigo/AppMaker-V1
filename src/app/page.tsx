@@ -137,7 +137,7 @@ export default function Home() {
             }}
           >
             <div style={{ height: '100%' }}>
-              <PromptPreview data={promptData} />
+              <PromptPreview data={promptData} mode={selectedMode} />
             </div>
           </Splitter.Panel>
         </Splitter>

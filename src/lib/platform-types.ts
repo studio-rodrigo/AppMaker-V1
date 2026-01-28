@@ -1,4 +1,4 @@
-export type PlatformType = 'figma-make' | 'lovable' | 'cursor';
+export type PlatformType = 'v0' | 'figma-make' | 'lovable' | 'cursor' | 'windsurf';
 
 export interface PlatformConfig {
   name: string;
