@@ -1,8 +1,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Card, Button, Typography, Space, Progress, Modal, message, Dropdown, Alert, Tabs, Tag } from 'antd';
-import { CopyOutlined, CheckOutlined, RocketOutlined, DownOutlined, ScissorOutlined, DownloadOutlined, WarningOutlined } from '@ant-design/icons';
+import { Card, Button, Typography, Space, Progress, Modal, message, Dropdown, Alert, Tabs, Tag, Collapse } from 'antd';
+import { CopyOutlined, CheckOutlined, RocketOutlined, DownOutlined, ScissorOutlined, DownloadOutlined, WarningOutlined, ApiOutlined, LinkOutlined } from '@ant-design/icons';
+import type { ApiCategory, StackPlanResponse } from '@/app/api/plan-stack/route';
 import { PromptData, WorkflowMode } from '@/lib/types';
 import { generatePrompt, getCompletenessScore } from '@/lib/prompt-generator';
 import { getSafeFilename } from '@/lib/cursor-export';
@@ -26,6 +27,11 @@ export default function PromptPreview({ data, mode }: PromptPreviewProps) {
   const [enhancedPlatform, setEnhancedPlatform] = useState<PlatformType>('cursor');
   const [splitParts, setSplitParts] = useState<PromptPart[]>([]);
   const [showSplitModal, setShowSplitModal] = useState(false);
+  
+  // Plan Stack state
+  const [isPlanning, setIsPlanning] = useState(false);
+  const [stackPlan, setStackPlan] = useState<StackPlanResponse | null>(null);
+  const [showStackModal, setShowStackModal] = useState(false);
   
   // Generate prompt based on mode (defaults to 'product' if no mode selected)
   const prompt = generatePrompt(data, mode || 'product');
@@ -121,6 +127,33 @@ export default function PromptPreview({ data, mode }: PromptPreviewProps) {
     setSelectedPlatform(platform);
   };
 
+  const handlePlanStack = async () => {
+    setIsPlanning(true);
+    try {
+      const response = await fetch('/api/plan-stack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data }),
+      });
+
+      const responseData = await response.json();
+
+      if (responseData.error) {
+        message.error(responseData.error);
+        return;
+      }
+
+      if (responseData.success) {
+        setStackPlan(responseData);
+        setShowStackModal(true);
+      }
+    } catch {
+      message.error('Failed to plan stack');
+    } finally {
+      setIsPlanning(false);
+    }
+  };
+
   const platformMenuItems = useMemo(() => {
     return platformOptions.map((p) => ({
       key: p.key,
@@ -203,6 +236,15 @@ export default function PromptPreview({ data, mode }: PromptPreviewProps) {
       }
       extra={
         <Space>
+          {completeness >= 80 && (
+            <Button
+              icon={<ApiOutlined />}
+              onClick={handlePlanStack}
+              loading={isPlanning}
+            >
+              Plan Stack
+            </Button>
+          )}
           <Dropdown.Button
             type="primary"
             icon={<DownOutlined />}
@@ -447,6 +489,129 @@ export default function PromptPreview({ data, mode }: PromptPreviewProps) {
         </div>
       </Modal>
 
+      {/* Stack Plan Modal */}
+      <Modal
+        title={
+          <Space>
+            <ApiOutlined />
+            <span>API Integration Plan</span>
+          </Space>
+        }
+        open={showStackModal}
+        onCancel={() => setShowStackModal(false)}
+        width={800}
+        footer={[
+          <Button key="close" onClick={() => setShowStackModal(false)}>
+            Close
+          </Button>,
+          <Button 
+            key="copy" 
+            type="primary" 
+            icon={<CopyOutlined />}
+            onClick={async () => {
+              if (stackPlan) {
+                const text = formatStackPlanForCopy(stackPlan);
+                await navigator.clipboard.writeText(text);
+                message.success('Stack plan copied to clipboard!');
+              }
+            }}
+          >
+            Copy Summary
+          </Button>,
+        ]}
+      >
+        {stackPlan && (
+          <div>
+            {/* Summary */}
+            <Alert
+              message="Recommended Stack"
+              description={stackPlan.summary}
+              type="info"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+
+            {/* Categories */}
+            <Collapse
+              defaultActiveKey={stackPlan.categories.map((_, i) => String(i))}
+              items={stackPlan.categories.map((category, index) => ({
+                key: String(index),
+                label: (
+                  <Space>
+                    <strong>{category.category}</strong>
+                    <Tag color="blue">{category.suggestions.length} options</Tag>
+                  </Space>
+                ),
+                children: (
+                  <div>
+                    <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
+                      {category.reason}
+                    </Text>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {category.suggestions.map((suggestion, sIndex) => (
+                        <div
+                          key={sIndex}
+                          style={{
+                            background: '#1f1f1f',
+                            border: '1px solid #303030',
+                            borderRadius: 8,
+                            padding: 12,
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                            <div>
+                              <Text strong style={{ fontSize: 15 }}>{suggestion.name}</Text>
+                              <Text type="secondary" style={{ marginLeft: 8 }}>{suggestion.description}</Text>
+                            </div>
+                            <Button
+                              type="link"
+                              icon={<LinkOutlined />}
+                              href={suggestion.url}
+                              target="_blank"
+                              size="small"
+                            >
+                              Visit
+                            </Button>
+                          </div>
+                          <div style={{ marginBottom: 4 }}>
+                            <Text style={{ color: 'rgba(255, 255, 255, 0.65)' }}>{suggestion.useCase}</Text>
+                          </div>
+                          <Tag color="green">{suggestion.pricing}</Tag>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ),
+              }))}
+            />
+          </div>
+        )}
+      </Modal>
+
     </Card>
   );
+}
+
+// Helper function to format stack plan for clipboard
+function formatStackPlanForCopy(plan: StackPlanResponse): string {
+  const lines: string[] = [];
+  
+  lines.push('# API Integration Plan\n');
+  lines.push(plan.summary);
+  lines.push('');
+  
+  plan.categories.forEach((category) => {
+    lines.push(`## ${category.category}`);
+    lines.push(`*${category.reason}*\n`);
+    
+    category.suggestions.forEach((suggestion, index) => {
+      lines.push(`${index + 1}. **${suggestion.name}** - ${suggestion.description}`);
+      lines.push(`   - Use case: ${suggestion.useCase}`);
+      lines.push(`   - Pricing: ${suggestion.pricing}`);
+      lines.push(`   - URL: ${suggestion.url}`);
+      lines.push('');
+    });
+  });
+  
+  return lines.join('\n');
 }
